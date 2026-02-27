@@ -81,7 +81,7 @@ export default function App() {
   const monthlyProfit = Math.max(0, unitsPerDay * marginPerUnit * 30);
   const paybackDays = monthlyProfit > 0 ? Math.ceil(firstOrder / (monthlyProfit / 30)) : 0;
   const roiPercent = firstOrder > 0 ? Math.round((monthlyProfit / firstOrder) * 100) : 0;
-  const instagramItems = (instagramFeed.items || []).slice(0, 3);
+  const instagramItems = (instagramFeed.items || []).slice(0, 6);
   const toBRL = (value) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value || 0);
 
@@ -431,7 +431,7 @@ export default function App() {
                 <Instagram size={14} /> @docuradafazenda_oficial
               </a>
             </motion.div>
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
+            <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
               {instagramItems.map((item, index) => (
                 <motion.a
                   key={item.id}
@@ -448,7 +448,7 @@ export default function App() {
                       event.currentTarget.onerror = null;
                       event.currentTarget.src = instagramFallback[index] || "/Assets/Display-1.png";
                     }}
-                    className="h-64 w-full object-cover transition duration-300 group-hover:scale-105"
+                    className="aspect-square w-full object-cover transition duration-300 group-hover:scale-105"
                   />
                 </motion.a>
               ))}
