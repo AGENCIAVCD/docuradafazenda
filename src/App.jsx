@@ -479,7 +479,7 @@ export default function App() {
           target="_blank"
           rel="noreferrer"
           aria-label="Falar no WhatsApp"
-          className="mc-btn fixed bottom-24 right-5 z-50 inline-flex h-14 w-14 items-center justify-center rounded-2xl border-[#fdf8df] bg-[#2E4A23] text-[#fdf8df] animate-float-pulse md:bottom-5"
+          className="mc-btn fixed bottom-5 right-5 z-50 hidden h-14 w-14 items-center justify-center rounded-2xl border-[#fdf8df] bg-[#2E4A23] text-[#fdf8df] animate-float-pulse md:inline-flex"
         >
           <MessageCircle size={26} />
         </a>
@@ -492,7 +492,7 @@ export default function App() {
               : { y: 120, opacity: 0, pointerEvents: "none" }
           }
           transition={{ duration: 0.35, ease: "easeOut" }}
-          className="fixed bottom-3 left-1/2 z-[60] w-[calc(100vw-14px)] max-w-[740px] -translate-x-1/2 rounded-2xl border-2 border-[#1a1a1a] bg-gradient-to-r from-[#141414] via-[#101010] to-[#1a2414] px-3 py-3 text-[#fdf8df] shadow-[0_12px_34px_rgba(0,0,0,0.35)] sm:w-[calc(100vw-24px)]"
+          className="fixed bottom-2 left-2 right-2 z-[60] translate-x-0 rounded-2xl border-2 border-[#1a1a1a] bg-gradient-to-r from-[#141414] via-[#101010] to-[#1a2414] px-3 py-3 text-[#fdf8df] shadow-[0_12px_34px_rgba(0,0,0,0.35)] sm:bottom-3 sm:left-1/2 sm:right-auto sm:w-[calc(100vw-24px)] sm:max-w-[740px] sm:-translate-x-1/2"
         >
           <div className="mx-auto flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
             <p className="inline-flex items-center justify-center gap-2 text-center text-[11px] font-bold leading-snug text-[#fff5d0] sm:justify-start sm:text-left sm:text-xs sm:font-extrabold sm:uppercase sm:tracking-[0.09em]">
