@@ -5,7 +5,6 @@ import {
   BadgeDollarSign,
   Bus,
   Calculator,
-  Factory,
   Instagram,
   Megaphone,
   MessageCircle,
@@ -48,6 +47,12 @@ const products = [
   { name: "Barra 400g", image: "/Assets/Barra-tradicional-400g.png", line: "Volume" },
   { name: "Ameixa", image: "/Assets/Ameixa-Pastoso.jpg", line: "Mix premium" },
   { name: "Coco", image: "/Assets/Coco-Pastoso.jpg", line: "Alta saída" },
+];
+
+const instagramFallback = [
+  "/instagram/post-1.jpg",
+  "/instagram/post-2.jpg",
+  "/instagram/post-3.jpg",
 ];
 
 export default function App() {
@@ -109,9 +114,6 @@ export default function App() {
 
           <div className="relative z-10 mx-auto grid min-h-[78vh] max-w-7xl items-center gap-10 px-6 pb-20 pt-10 md:px-10">
             <motion.div {...reveal(0.3)} className="text-[#fdf8df]">
-              <p className="mb-4 inline-flex items-center gap-2 border-l-4 border-[#ffb300] bg-black/25 px-3 py-2 text-xs font-bold uppercase tracking-[0.15em]">
-                <Factory size={14} /> B2B para mercado e parada de ônibus
-              </p>
               <h1 className="font-title text-4xl font-bold leading-[1.05] md:text-7xl">
                 Leve a Tradição Mineira de Cambuí para sua Prateleira
               </h1>
@@ -441,7 +443,11 @@ export default function App() {
                 >
                   <img
                     src={item.image}
-                    alt={item.caption || "Preview Instagram"}
+                    alt="Publicação no Instagram da Doçura da Fazenda"
+                    onError={(event) => {
+                      event.currentTarget.onerror = null;
+                      event.currentTarget.src = instagramFallback[index] || "/Assets/Display-1.png";
+                    }}
                     className="h-64 w-full object-cover transition duration-300 group-hover:scale-105"
                   />
                 </motion.a>
