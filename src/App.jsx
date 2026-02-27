@@ -431,7 +431,7 @@ export default function App() {
                 <Instagram size={14} /> @docuradafazenda_oficial
               </a>
             </motion.div>
-            <div className="mt-5 grid grid-cols-2 gap-2.5 md:grid-cols-3 md:gap-3">
+            <div className="mx-auto mt-5 grid max-w-5xl grid-cols-2 gap-2.5 md:grid-cols-3 md:gap-3">
               {instagramItems.map((item, index) => (
                 <motion.a
                   key={item.id}
@@ -448,7 +448,7 @@ export default function App() {
                       event.currentTarget.onerror = null;
                       event.currentTarget.src = instagramFallback[index] || "/Assets/Display-1.png";
                     }}
-                    className="aspect-square w-full object-cover transition duration-300 group-hover:scale-105 md:aspect-auto md:h-40"
+                    className="aspect-square w-full object-cover transition duration-300 group-hover:scale-105"
                   />
                 </motion.a>
               ))}
@@ -492,11 +492,12 @@ export default function App() {
               : { y: 120, opacity: 0, pointerEvents: "none" }
           }
           transition={{ duration: 0.35, ease: "easeOut" }}
-          className="fixed bottom-3 left-1/2 z-[60] w-[calc(100vw-16px)] max-w-[740px] -translate-x-1/2 rounded-2xl border-2 border-[#1a1a1a] bg-gradient-to-r from-[#141414] via-[#101010] to-[#1a2414] px-3 py-3 text-[#fdf8df] shadow-[0_12px_34px_rgba(0,0,0,0.35)]"
+          className="fixed bottom-3 left-1/2 z-[60] w-[calc(100vw-14px)] max-w-[740px] -translate-x-1/2 rounded-2xl border-2 border-[#1a1a1a] bg-gradient-to-r from-[#141414] via-[#101010] to-[#1a2414] px-3 py-3 text-[#fdf8df] shadow-[0_12px_34px_rgba(0,0,0,0.35)] sm:w-[calc(100vw-24px)]"
         >
           <div className="mx-auto flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-[11px] font-extrabold uppercase leading-tight tracking-[0.09em] text-[#fff5d0] sm:text-xs">
-              Produto fora da sua prateleira = venda perdida todo dia.
+            <p className="inline-flex items-center justify-center gap-2 text-center text-[11px] font-bold leading-snug text-[#fff5d0] sm:justify-start sm:text-left sm:text-xs sm:font-extrabold sm:uppercase sm:tracking-[0.09em]">
+              <span className="inline-block h-2 w-2 rounded-full bg-[#ffb300] animate-pulse sm:hidden" />
+              Nova oportunidade: você pode estar perdendo venda diária.
             </p>
             <a
               href={whatsappLink}
