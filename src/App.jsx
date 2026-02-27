@@ -418,7 +418,7 @@ export default function App() {
           </motion.div>
         </section>
 
-        <section className="bg-[#2E4A23] py-16 text-[#fdf8df]">
+        <section className="bg-[#2E4A23] py-10 text-[#fdf8df]">
           <div className="mx-auto max-w-7xl px-6 md:px-10">
             <motion.div {...reveal(0.3)} className="flex items-center justify-between gap-4">
               <h2 className="font-title text-3xl font-bold uppercase tracking-[0.06em] md:text-4xl">Instagram</h2>
@@ -431,7 +431,7 @@ export default function App() {
                 <Instagram size={14} /> @docuradafazenda_oficial
               </a>
             </motion.div>
-            <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+            <div className="mt-5 grid grid-cols-2 gap-2.5 md:grid-cols-3 md:gap-3">
               {instagramItems.map((item, index) => (
                 <motion.a
                   key={item.id}
@@ -448,7 +448,7 @@ export default function App() {
                       event.currentTarget.onerror = null;
                       event.currentTarget.src = instagramFallback[index] || "/Assets/Display-1.png";
                     }}
-                    className="aspect-square w-full object-cover transition duration-300 group-hover:scale-105"
+                    className="aspect-square w-full object-cover transition duration-300 group-hover:scale-105 md:aspect-auto md:h-40"
                   />
                 </motion.a>
               ))}
@@ -461,7 +461,7 @@ export default function App() {
             <div>
               <p className="font-bold uppercase tracking-[0.08em]">Doçura da Fazenda</p>
               <p>Doçura da Fazenda - Cambuí - MG, 37600-000, Brasil.</p>
-              <p>CNPJ: 00.000.000/0000-00</p>
+              <p>CNPJ: 02.850.765/0001-46</p>
             </div>
             <a
               href={whatsappLink}
@@ -492,17 +492,17 @@ export default function App() {
               : { y: 120, opacity: 0, pointerEvents: "none" }
           }
           transition={{ duration: 0.35, ease: "easeOut" }}
-          className="fixed bottom-3 left-1/2 z-[60] w-[min(680px,94vw)] -translate-x-1/2 rounded-xl border-2 border-[#1a1a1a] bg-[#111111] px-3 py-2 text-[#fdf8df]"
+          className="fixed bottom-3 left-1/2 z-[60] w-[calc(100vw-16px)] max-w-[740px] -translate-x-1/2 rounded-2xl border-2 border-[#1a1a1a] bg-gradient-to-r from-[#141414] via-[#101010] to-[#1a2414] px-3 py-3 text-[#fdf8df] shadow-[0_12px_34px_rgba(0,0,0,0.35)]"
         >
-          <div className="mx-auto flex items-center justify-between gap-2">
-            <p className="text-[10px] font-bold uppercase tracking-[0.08em] md:text-xs">
-              Sem o produto no mix, você perde venda diária.
+          <div className="mx-auto flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[11px] font-extrabold uppercase leading-tight tracking-[0.09em] text-[#fff5d0] sm:text-xs">
+              Produto fora da sua prateleira = venda perdida todo dia.
             </p>
             <a
               href={whatsappLink}
               target="_blank"
               rel="noreferrer"
-              className="mc-btn mc-btn-gold inline-flex items-center gap-1 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.08em] md:text-[11px]"
+              className="mc-btn mc-btn-gold inline-flex w-full items-center justify-center gap-1 px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.08em] sm:w-auto"
             >
               Receber tabela
               <ArrowUpRight size={12} />
