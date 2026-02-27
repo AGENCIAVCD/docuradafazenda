@@ -272,12 +272,18 @@ export default function App() {
                   {...reveal(0.25, index * 0.05)}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border-2 border-[#ffe38d] bg-[#2E4A23] transition duration-300 hover:scale-105"
                 >
-                  <div className="relative h-56 overflow-hidden rounded-t-2xl bg-gradient-to-b from-[#18447f] to-[#0b1e3b]">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,227,141,0.22),transparent_55%)]" />
+                  <div className="relative h-64 overflow-hidden rounded-t-2xl bg-[#17365f]">
+                    <img
+                      src={product.image}
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute inset-0 h-full w-full scale-110 object-cover opacity-70 blur-sm"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#153667]/35 via-[#133159]/45 to-[#0f2847]/68" />
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="relative h-full w-full object-contain p-4 transition duration-300 group-hover:scale-105"
+                      className="relative z-10 h-full w-full object-contain p-3 transition duration-300 group-hover:scale-105"
                     />
                   </div>
                   <div className="flex flex-1 flex-col justify-end p-4">
