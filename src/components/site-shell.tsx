@@ -55,6 +55,7 @@ export function SiteShell({ page, productSlug }: SiteShellProps) {
       {page === "product" ? <ProductDetailPage productSlug={productSlug} /> : null}
       {page === "contact" ? <ContactPage /> : null}
 
+      <FloatingWhatsApp />
       <Footer />
     </div>
   );
@@ -1012,6 +1013,30 @@ function ContactRow({
         <p className="mt-1 text-base leading-7 text-black/76">{value}</p>
       </div>
     </div>
+  );
+}
+
+function FloatingWhatsApp() {
+  const message = encodeURIComponent(
+    "Olá! Vim pelo site da Doçura da Fazenda e gostaria de falar com vocês.",
+  );
+
+  return (
+    <a
+      aria-label="Falar com a Doçura da Fazenda pelo WhatsApp"
+      className="floating-whatsapp"
+      href={`${siteData.whatsappUrl}?text=${message}`}
+      rel="noreferrer"
+      target="_blank"
+    >
+      <span className="floating-whatsapp-bubble">
+        <strong>Oi! Precisa de ajuda?</strong>
+        Fale com a Doçura pelo WhatsApp.
+      </span>
+      <span className="floating-whatsapp-button">
+        <MessageCircle className="h-6 w-6" />
+      </span>
+    </a>
   );
 }
 
