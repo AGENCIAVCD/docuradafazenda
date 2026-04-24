@@ -1,5 +1,45 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Grift";
+  src: url("/assets/fonts/grift/Grift-Regular.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Grift";
+  src: url("/assets/fonts/grift/Grift-SemiBold.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Grift";
+  src: url("/assets/fonts/grift/Grift-Bold.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Grift";
+  src: url("/assets/fonts/grift/Grift-ExtraBold.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 800;
+}
+
+@font-face {
+  font-family: "Grift";
+  src: url("/assets/fonts/grift/Grift-Black.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 900;
+}
+
 :root {
   --background: #fff8e9;
   --foreground: #24170f;
@@ -11,6 +51,7 @@
   --red: #b6422d;
   --wood: #321b12;
   --ink: #24170f;
+  --font-sans: "Grift", Montserrat, Arial, sans-serif;
   --font-heading: var(--font-display), Georgia, serif;
 }
 
