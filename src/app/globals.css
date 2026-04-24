@@ -68,8 +68,8 @@ a {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(255, 248, 233, 0.08) 0%, rgba(255, 248, 233, 0.02) 54%, rgba(255, 248, 233, 0) 100%),
-    linear-gradient(0deg, rgba(255, 248, 233, 0.38) 0%, rgba(255, 248, 233, 0) 22%);
+    linear-gradient(90deg, rgba(36, 23, 15, 0.28) 0%, rgba(36, 23, 15, 0.08) 52%, rgba(36, 23, 15, 0.18) 100%),
+    linear-gradient(0deg, rgba(255, 248, 233, 0.48) 0%, rgba(255, 248, 233, 0) 28%);
   pointer-events: none;
   z-index: 1;
 }
@@ -77,8 +77,8 @@ a {
 .glass-panel {
   border: 1px solid rgb(255 255 255 / 0.72);
   border-radius: 15px;
-  background: rgb(255 248 233 / 0.9);
-  box-shadow: 0 30px 80px rgb(36 23 15 / 0.28);
+  background: rgb(255 248 233 / 0.96);
+  box-shadow: 0 32px 90px rgb(36 23 15 / 0.36);
   color: var(--wood);
   padding: 2.2rem;
   backdrop-filter: blur(22px) saturate(1.2);
@@ -119,6 +119,41 @@ a {
 .photo-frame {
   border-radius: 15px;
   box-shadow: 0 22px 55px rgb(36 23 15 / 0.16);
+}
+
+.pillar-grid {
+  position: relative;
+}
+
+.pillar-card {
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 15px;
+  background:
+    radial-gradient(circle at 15% 0%, rgb(243 197 21 / 0.2), transparent 36%),
+    linear-gradient(145deg, var(--wood), #1f130d);
+  color: white;
+  padding: 1.35rem;
+  box-shadow: 0 22px 58px rgb(36 23 15 / 0.18);
+}
+
+.pillar-card:nth-child(even) {
+  background:
+    radial-gradient(circle at 85% 0%, rgb(243 197 21 / 0.22), transparent 34%),
+    linear-gradient(145deg, var(--green), #173024);
+}
+
+.pillar-card p {
+  color: rgb(255 255 255 / 0.76);
+}
+
+.pillar-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: rgb(255 248 233 / 0.92);
+  padding: 0.72rem;
+  box-shadow: 0 16px 32px rgb(0 0 0 / 0.22);
 }
 
 .hero-control {
@@ -300,6 +335,25 @@ a {
 .product-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 24px 60px rgb(36 23 15 / 0.12);
+}
+
+.product-segment {
+  scroll-margin-top: 6rem;
+}
+
+.product-segment-header {
+  display: grid;
+  gap: 1rem;
+  align-items: end;
+  border-bottom: 1px solid rgb(36 23 15 / 0.14);
+  padding-bottom: 1rem;
+}
+
+.product-segment-header > p {
+  max-width: 34rem;
+  color: rgb(36 23 15 / 0.68);
+  font-size: 1rem;
+  line-height: 1.8;
 }
 
 .product-image-stage {
@@ -542,6 +596,10 @@ a {
 @media (min-width: 768px) {
   .section-shell {
     padding-inline: 1.5rem;
+  }
+
+  .product-segment-header {
+    grid-template-columns: 1fr 0.8fr;
   }
 
   .hero-title {

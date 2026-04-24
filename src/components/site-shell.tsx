@@ -340,16 +340,16 @@ function AboutSection() {
         </div>
       </div>
 
-      <div className="mt-14 grid gap-px overflow-hidden rounded-[15px] border border-black/10 bg-black/10 shadow-[0_22px_55px_rgba(36,23,15,0.08)] md:grid-cols-4">
+      <div className="pillar-grid mt-14 grid gap-4 md:grid-cols-4">
         {siteData.about.pillars.map((pillar) => (
-          <article key={pillar.title} className="bg-[var(--cream)] p-6">
-            <div className="relative h-16 w-16">
+          <article key={pillar.title} className="pillar-card">
+            <div className="pillar-icon relative h-16 w-16">
               <Image src={pillar.image} alt={pillar.title} fill className="object-contain" />
             </div>
             <h3 className="mt-5 font-[family:var(--font-display)] text-2xl">
               {pillar.title}
             </h3>
-            <p className="mt-3 text-sm leading-7 text-black/68">{pillar.body}</p>
+            <p className="mt-3 text-sm leading-7">{pillar.body}</p>
           </article>
         ))}
       </div>
@@ -492,7 +492,7 @@ function FeaturedProductCategories() {
       {siteData.productCategories.map((category) => (
         <Link
           key={category.slug}
-          href={`/products?categoria=${category.slug}`}
+          href={`/products#${category.slug}`}
           className="category-card group"
         >
           <div className="product-image-stage relative h-72">
@@ -515,8 +515,14 @@ function FeaturedProductCategories() {
   );
 }
 
-function ProductGrid({ limit }: { limit?: number }) {
-  const products = limit ? siteData.products.slice(0, limit) : siteData.products;
+function ProductGrid({
+  limit,
+  products: providedProducts,
+}: {
+  limit?: number;
+  products?: typeof siteData.products;
+}) {
+  const products = providedProducts ?? (limit ? siteData.products.slice(0, limit) : siteData.products);
 
   return (
     <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -624,7 +630,7 @@ function ProductsPage() {
     <main>
       <section className="products-hero relative overflow-hidden">
         <Image
-          src="/assets/images/11-1280x860-1.jpeg"
+          src="/assets/images/emporio-0-1280x860-1.jpeg"
           alt=""
           fill
           priority
@@ -676,9 +682,41 @@ function ProductsPage() {
             Falar com vendas
           </a>
         </div>
-        <ProductGrid />
+        <ProductSegments />
       </section>
     </main>
+  );
+}
+
+function ProductSegments() {
+  return (
+    <div className="mt-10 grid gap-12">
+      {siteData.productCategories.map((category) => {
+        const products = siteData.products.filter(
+          (product) => product.category === category.name,
+        );
+
+        return (
+          <section key={category.slug} id={category.slug} className="product-segment">
+            <div className="product-segment-header">
+              <div>
+                <p className="eyebrow">{category.name}</p>
+                <h3 className="font-[family:var(--font-display)] text-4xl leading-none">
+                  {category.name === "Display"
+                    ? "Displays e potes para ponto de venda"
+                    : category.name === "Pastoso"
+                      ? "Doces pastosos por sabor e embalagem"
+                      : "Barras e tabletes de 400 g"}
+                </h3>
+              </div>
+              <p>{category.description}</p>
+            </div>
+
+            <ProductGrid products={products} />
+          </section>
+        );
+      })}
+    </div>
   );
 }
 

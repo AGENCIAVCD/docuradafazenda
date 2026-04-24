@@ -36,9 +36,9 @@ export const siteData = {
         "Produção familiar, textura cremosa e ingredientes selecionados para preservar o sabor autêntico que acompanha a mesa mineira.",
       cta: "Conheça os produtos",
       href: "/products",
-      mediaType: "video",
-      media: "/assets/videos/bg-principal-1-com-vaquinha.mp4",
-      fallback: "/assets/images/11-1280x860-1.jpeg",
+      mediaType: "image",
+      media: "/assets/images/emporio-1-1280x860-1.jpeg",
+      fallback: "/assets/images/emporio-1-1280x860-1.jpeg",
       product: "/assets/images/img-docepastoso.png",
     },
     {
