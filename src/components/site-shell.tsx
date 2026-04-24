@@ -166,6 +166,7 @@ function HeroCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
   const dragStartX = useRef<number | null>(null);
   const shouldBlockClick = useRef(false);
+  const hasDragged = useRef(false);
   const activeBanner = siteData.heroBanners[activeIndex];
 
   useEffect(() => {
@@ -201,28 +202,33 @@ function HeroCarousel() {
     setActiveIndex((current) => (current + 1) % siteData.heroBanners.length);
   };
 
-  const handlePointerUp = (clientX: number) => {
+  const blockNextClick = () => {
+    shouldBlockClick.current = true;
+    window.setTimeout(() => {
+      shouldBlockClick.current = false;
+    }, 80);
+  };
+
+  const handleDragMove = (clientX: number) => {
     if (dragStartX.current === null) {
       return;
     }
 
     const distance = clientX - dragStartX.current;
-    dragStartX.current = null;
 
     if (Math.abs(distance) < 48) {
       return;
     }
 
-    shouldBlockClick.current = true;
+    hasDragged.current = true;
+    dragStartX.current = clientX;
+    blockNextClick();
+
     if (distance > 0) {
       goToPrevious();
     } else {
       goToNext();
     }
-
-    window.setTimeout(() => {
-      shouldBlockClick.current = false;
-    }, 0);
   };
 
   return (
@@ -239,11 +245,25 @@ function HeroCarousel() {
       }}
       onPointerCancel={() => {
         dragStartX.current = null;
+        hasDragged.current = false;
       }}
       onPointerDown={(event) => {
         dragStartX.current = event.clientX;
+        hasDragged.current = false;
+        event.currentTarget.setPointerCapture(event.pointerId);
       }}
-      onPointerUp={(event) => handlePointerUp(event.clientX)}
+      onPointerMove={(event) => handleDragMove(event.clientX)}
+      onPointerUp={(event) => {
+        if (hasDragged.current) {
+          blockNextClick();
+        }
+
+        dragStartX.current = null;
+        hasDragged.current = false;
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }
+      }}
     >
       <div key={activeBanner.title} className="absolute inset-0">
         {activeBanner.mediaType === "video" ? (
@@ -299,7 +319,10 @@ function HeroCarousel() {
 
       </div>
 
-      <div className="hero-carousel-dock">
+      <div
+        className="hero-carousel-dock"
+        onPointerDown={(event) => event.stopPropagation()}
+      >
         <button
           aria-label="Banner anterior"
           className="hero-control"
@@ -429,6 +452,7 @@ function ProductShowcase3D() {
   const [activeIndex, setActiveIndex] = useState(0);
   const dragStartX = useRef<number | null>(null);
   const shouldBlockClick = useRef(false);
+  const hasDragged = useRef(false);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -448,28 +472,33 @@ function ProductShowcase3D() {
     setActiveIndex((current) => (current + 1) % showcaseProducts.length);
   };
 
-  const handlePointerUp = (clientX: number) => {
+  const blockNextClick = () => {
+    shouldBlockClick.current = true;
+    window.setTimeout(() => {
+      shouldBlockClick.current = false;
+    }, 80);
+  };
+
+  const handleDragMove = (clientX: number) => {
     if (dragStartX.current === null) {
       return;
     }
 
     const distance = clientX - dragStartX.current;
-    dragStartX.current = null;
 
     if (Math.abs(distance) < 42) {
       return;
     }
 
-    shouldBlockClick.current = true;
+    hasDragged.current = true;
+    dragStartX.current = clientX;
+    blockNextClick();
+
     if (distance > 0) {
       goToPrevious();
     } else {
       goToNext();
     }
-
-    window.setTimeout(() => {
-      shouldBlockClick.current = false;
-    }, 0);
   };
 
   return (
@@ -499,11 +528,25 @@ function ProductShowcase3D() {
         }}
         onPointerCancel={() => {
           dragStartX.current = null;
+          hasDragged.current = false;
         }}
         onPointerDown={(event) => {
           dragStartX.current = event.clientX;
+          hasDragged.current = false;
+          event.currentTarget.setPointerCapture(event.pointerId);
         }}
-        onPointerUp={(event) => handlePointerUp(event.clientX)}
+        onPointerMove={(event) => handleDragMove(event.clientX)}
+        onPointerUp={(event) => {
+          if (hasDragged.current) {
+            blockNextClick();
+          }
+
+          dragStartX.current = null;
+          hasDragged.current = false;
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          }
+        }}
       >
         {showcaseProducts.map((product, index) => {
           const rawOffset = index - activeIndex;
@@ -542,7 +585,10 @@ function ProductShowcase3D() {
         })}
       </div>
 
-      <div className="product-3d-controls">
+      <div
+        className="product-3d-controls"
+        onPointerDown={(event) => event.stopPropagation()}
+      >
         <button
           aria-label="Produto anterior"
           className="hero-control"
