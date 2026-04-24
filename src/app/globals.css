@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Spearhead";
+  src: url("/assets/fonts/SPEARHEAD.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
 :root {
   --background: #fff8e9;
   --foreground: #24170f;
@@ -11,6 +19,7 @@
   --red: #b6422d;
   --wood: #321b12;
   --ink: #24170f;
+  --font-heading: "Spearhead", var(--font-display), Georgia, serif;
 }
 
 ::selection {
@@ -61,6 +70,13 @@ a {
   isolation: isolate;
   overflow: hidden;
   background: var(--cream);
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.hero-section:active {
+  cursor: grabbing;
 }
 
 .hero-section::after {
@@ -194,7 +210,7 @@ a {
 .hero-title {
   margin-top: 0.8rem;
   max-width: 40rem;
-  font-family: var(--font-display), serif;
+  font-family: var(--font-heading);
   font-size: 3.2rem;
   line-height: 0.96;
   letter-spacing: 0;
@@ -210,7 +226,7 @@ a {
 
 .section-title {
   margin-top: 0.8rem;
-  font-family: var(--font-display), serif;
+  font-family: var(--font-heading);
   font-size: 2.6rem;
   line-height: 1.02;
   letter-spacing: 0;
@@ -423,6 +439,13 @@ a {
   height: 28rem;
   margin-top: 1.5rem;
   perspective: 1200px;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.product-3d-stage:active {
+  cursor: grabbing;
 }
 
 .product-3d-card {
@@ -578,7 +601,7 @@ a {
 .footer-stat span {
   display: block;
   color: var(--yellow);
-  font-family: var(--font-display), serif;
+  font-family: var(--font-heading);
   font-size: 2rem;
   line-height: 1;
 }

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { siteData } from "@/lib/site-data";
 
@@ -82,7 +82,7 @@ function Header({
             className="h-14 w-auto"
           />
           <div className="hidden min-[430px]:block">
-            <p className="font-[family:var(--font-display)] text-xl leading-none">
+            <p className="font-[family:var(--font-heading)] text-xl leading-none">
               Doçura da Fazenda
             </p>
             <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-[var(--green)]">
@@ -164,6 +164,8 @@ function HomePage() {
 
 function HeroCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const dragStartX = useRef<number | null>(null);
+  const shouldBlockClick = useRef(false);
   const activeBanner = siteData.heroBanners[activeIndex];
 
   useEffect(() => {
@@ -199,8 +201,50 @@ function HeroCarousel() {
     setActiveIndex((current) => (current + 1) % siteData.heroBanners.length);
   };
 
+  const handlePointerUp = (clientX: number) => {
+    if (dragStartX.current === null) {
+      return;
+    }
+
+    const distance = clientX - dragStartX.current;
+    dragStartX.current = null;
+
+    if (Math.abs(distance) < 48) {
+      return;
+    }
+
+    shouldBlockClick.current = true;
+    if (distance > 0) {
+      goToPrevious();
+    } else {
+      goToNext();
+    }
+
+    window.setTimeout(() => {
+      shouldBlockClick.current = false;
+    }, 0);
+  };
+
   return (
-    <section className="hero-section">
+    <section
+      className="hero-section"
+      onClickCapture={(event) => {
+        if (!shouldBlockClick.current) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        shouldBlockClick.current = false;
+      }}
+      onPointerCancel={() => {
+        dragStartX.current = null;
+      }}
+      onPointerDown={(event) => {
+        dragStartX.current = event.clientX;
+      }}
+      onPointerUp={(event) => handlePointerUp(event.clientX)}
+    >
       <div key={activeBanner.title} className="absolute inset-0">
         {activeBanner.mediaType === "video" ? (
           <>
@@ -300,7 +344,7 @@ function TrustBar() {
       <div className="mx-auto grid max-w-7xl divide-y divide-black/10 px-4 md:grid-cols-3 md:divide-x md:divide-y-0 md:px-6">
         {items.map(([value, label]) => (
           <div key={value} className="py-6 md:px-8">
-            <p className="font-[family:var(--font-display)] text-4xl leading-none text-[var(--green)]">
+            <p className="font-[family:var(--font-heading)] text-4xl leading-none text-[var(--green)]">
               {value}
             </p>
             <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-black/55">
@@ -346,7 +390,7 @@ function AboutSection() {
             <div className="pillar-icon relative h-16 w-16">
               <Image src={pillar.image} alt={pillar.title} fill className="object-contain" />
             </div>
-            <h3 className="mt-5 font-[family:var(--font-display)] text-2xl">
+            <h3 className="mt-5 font-[family:var(--font-heading)] text-2xl">
               {pillar.title}
             </h3>
             <p className="mt-3 text-sm leading-7">{pillar.body}</p>
@@ -383,6 +427,8 @@ function ProductsSection() {
 function ProductShowcase3D() {
   const showcaseProducts = siteData.products.slice(8, 16);
   const [activeIndex, setActiveIndex] = useState(0);
+  const dragStartX = useRef<number | null>(null);
+  const shouldBlockClick = useRef(false);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -402,11 +448,35 @@ function ProductShowcase3D() {
     setActiveIndex((current) => (current + 1) % showcaseProducts.length);
   };
 
+  const handlePointerUp = (clientX: number) => {
+    if (dragStartX.current === null) {
+      return;
+    }
+
+    const distance = clientX - dragStartX.current;
+    dragStartX.current = null;
+
+    if (Math.abs(distance) < 42) {
+      return;
+    }
+
+    shouldBlockClick.current = true;
+    if (distance > 0) {
+      goToPrevious();
+    } else {
+      goToNext();
+    }
+
+    window.setTimeout(() => {
+      shouldBlockClick.current = false;
+    }, 0);
+  };
+
   return (
     <div className="product-3d-shell">
       <div className="product-3d-copy">
         <p className="eyebrow">Destaques da vitrine</p>
-        <h3 className="font-[family:var(--font-display)] text-4xl leading-none md:text-5xl">
+        <h3 className="font-[family:var(--font-heading)] text-4xl leading-none md:text-5xl">
           Um carrossel para sentir a linha girando na prateleira.
         </h3>
         <p className="mt-4 text-base leading-8 text-white/78">
@@ -415,7 +485,26 @@ function ProductShowcase3D() {
         </p>
       </div>
 
-      <div className="product-3d-stage" aria-label="Carrossel 3D de produtos">
+      <div
+        className="product-3d-stage"
+        aria-label="Carrossel 3D de produtos"
+        onClickCapture={(event) => {
+          if (!shouldBlockClick.current) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+          shouldBlockClick.current = false;
+        }}
+        onPointerCancel={() => {
+          dragStartX.current = null;
+        }}
+        onPointerDown={(event) => {
+          dragStartX.current = event.clientX;
+        }}
+        onPointerUp={(event) => handlePointerUp(event.clientX)}
+      >
         {showcaseProducts.map((product, index) => {
           const rawOffset = index - activeIndex;
           const offset =
@@ -540,7 +629,7 @@ function ProductGrid({
             <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--green)]">
               {product.category} • {product.size}
             </p>
-            <h3 className="mt-2 font-[family:var(--font-display)] text-2xl">
+            <h3 className="mt-2 font-[family:var(--font-heading)] text-2xl">
               {product.name}
             </h3>
             <p className="mt-3 text-sm leading-7 text-black/68">
@@ -640,7 +729,7 @@ function ProductsPage() {
         <div className="relative mx-auto grid min-h-[480px] max-w-7xl items-center gap-8 px-4 py-16 md:grid-cols-[1fr_0.72fr] md:px-6">
           <div className="max-w-3xl text-white">
             <p className="eyebrow text-[var(--yellow)]">Nossos produtos</p>
-            <h1 className="mt-3 font-[family:var(--font-display)] text-5xl leading-none md:text-7xl">
+            <h1 className="mt-3 font-[family:var(--font-heading)] text-5xl leading-none md:text-7xl">
               A linha completa da Doçura da Fazenda.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/82">
@@ -701,7 +790,7 @@ function ProductSegments() {
             <div className="product-segment-header">
               <div>
                 <p className="eyebrow">{category.name}</p>
-                <h3 className="font-[family:var(--font-display)] text-4xl leading-none">
+                <h3 className="font-[family:var(--font-heading)] text-4xl leading-none">
                   {category.name === "Display"
                     ? "Displays e potes para ponto de venda"
                     : category.name === "Pastoso"
@@ -799,7 +888,7 @@ function ProductDetailPage({ productSlug }: { productSlug?: string }) {
                   <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--green)]">
                     {item.size}
                   </p>
-                  <h3 className="mt-2 font-[family:var(--font-display)] text-2xl">
+                  <h3 className="mt-2 font-[family:var(--font-heading)] text-2xl">
                     {item.name}
                   </h3>
                 </div>
@@ -901,7 +990,7 @@ function Footer() {
             />
             <div>
               <p className="footer-title">Cambuí • Minas Gerais</p>
-              <p className="mt-2 max-w-xl font-[family:var(--font-display)] text-3xl leading-tight footer-heading">
+              <p className="mt-2 max-w-xl font-[family:var(--font-heading)] text-3xl leading-tight footer-heading">
                 Sabor mineiro desde 1998.
               </p>
             </div>
