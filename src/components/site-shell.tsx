@@ -429,7 +429,7 @@ function AboutSection() {
         {siteData.about.pillars.map((pillar) => (
           <article key={pillar.title} className="pillar-card">
             <div className="pillar-icon relative h-16 w-16">
-              <Image src={pillar.image} alt={pillar.title} fill className="object-contain" />
+              <Image src={pillar.image} alt={pillar.title} fill className="object-contain p-1" />
             </div>
             <h3 className="mt-5 font-[family:var(--font-heading)] text-2xl">
               <AccentText text={pillar.title} />
