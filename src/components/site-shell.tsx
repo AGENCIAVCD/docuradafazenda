@@ -27,6 +27,20 @@ type SiteShellProps = {
   productSlug?: string;
 };
 
+const accentPattern = /[À-ÖØ-öø-ÿ]/;
+
+function AccentText({ text }: { text: string }) {
+  return Array.from(text).map((character, index) =>
+    accentPattern.test(character) ? (
+      <span className="accent-glyph" key={`${character}-${index}`}>
+        {character}
+      </span>
+    ) : (
+      character
+    ),
+  );
+}
+
 export function SiteShell({ page, productSlug }: SiteShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -83,7 +97,7 @@ function Header({
           />
           <div className="hidden min-[430px]:block">
             <p className="font-[family:var(--font-heading)] text-xl leading-none">
-              Doçura da Fazenda
+              <AccentText text="Doçura da Fazenda" />
             </p>
             <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-[var(--green)]">
               Cambuí • MG
@@ -298,7 +312,9 @@ function HeroCarousel() {
       <div className="relative z-10 mx-auto flex min-h-[720px] max-w-7xl items-center px-4 pb-28 pt-14 md:px-6">
         <div key={activeBanner.title} className="hero-slide-copy glass-panel max-w-2xl">
           <p className="eyebrow">{activeBanner.eyebrow}</p>
-          <h1 className="hero-title">{activeBanner.title}</h1>
+          <h1 className="hero-title">
+            <AccentText text={activeBanner.title} />
+          </h1>
           <p className="hero-copy">{activeBanner.body}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link className="button-primary" href={activeBanner.href}>
@@ -368,7 +384,7 @@ function TrustBar() {
         {items.map(([value, label]) => (
           <div key={value} className="py-6 md:px-8">
             <p className="font-[family:var(--font-heading)] text-4xl leading-none text-[var(--green)]">
-              {value}
+              <AccentText text={value} />
             </p>
             <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-black/55">
               {label}
@@ -394,7 +410,9 @@ function AboutSection() {
         </div>
         <div>
           <p className="eyebrow">{siteData.about.eyebrow}</p>
-          <h2 className="section-title">{siteData.about.title}</h2>
+          <h2 className="section-title">
+            <AccentText text={siteData.about.title} />
+          </h2>
           <p className="section-copy">{siteData.about.body}</p>
           <div className="mt-8 grid gap-4">
             {siteData.about.bullets.map((bullet) => (
@@ -414,7 +432,7 @@ function AboutSection() {
               <Image src={pillar.image} alt={pillar.title} fill className="object-contain" />
             </div>
             <h3 className="mt-5 font-[family:var(--font-heading)] text-2xl">
-              {pillar.title}
+              <AccentText text={pillar.title} />
             </h3>
             <p className="mt-3 text-sm leading-7">{pillar.body}</p>
           </article>
@@ -431,7 +449,9 @@ function ProductsSection() {
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-3xl">
             <p className="eyebrow">Produtos</p>
-            <h2 className="section-title">{siteData.productsIntro.title}</h2>
+            <h2 className="section-title">
+              <AccentText text={siteData.productsIntro.title} />
+            </h2>
             <p className="section-copy">{siteData.productsIntro.body}</p>
           </div>
           <Link className="button-primary" href="/products">
@@ -506,7 +526,7 @@ function ProductShowcase3D() {
       <div className="product-3d-copy">
         <p className="eyebrow">Destaques da vitrine</p>
         <h3 className="font-[family:var(--font-heading)] text-4xl leading-none md:text-5xl">
-          Um carrossel para sentir a linha girando na prateleira.
+          <AccentText text="Um carrossel para sentir a linha girando na prateleira." />
         </h3>
         <p className="mt-4 text-base leading-8 text-white/78">
           Navegue pelos sabores em destaque e abra a página do produto para falar
@@ -676,7 +696,7 @@ function ProductGrid({
               {product.category} • {product.size}
             </p>
             <h3 className="mt-2 font-[family:var(--font-heading)] text-2xl">
-              {product.name}
+              <AccentText text={product.name} />
             </h3>
             <p className="mt-3 text-sm leading-7 text-black/68">
               {product.description}
@@ -697,7 +717,9 @@ function ResellerSection() {
       <div className="grid overflow-hidden rounded-[15px] bg-[var(--green)] text-white shadow-[0_24px_65px_rgba(23,79,61,0.18)] lg:grid-cols-[0.9fr_1.1fr]">
         <div className="p-7 md:p-10">
           <p className="eyebrow text-[var(--yellow)]">Parcerias</p>
-          <h2 className="section-title text-white">{siteData.reseller.title}</h2>
+          <h2 className="section-title text-white">
+            <AccentText text={siteData.reseller.title} />
+          </h2>
           <p className="mt-5 max-w-2xl text-base leading-8 text-white/82">
             {siteData.reseller.body}
           </p>
@@ -730,7 +752,7 @@ function ReviewsSection() {
         <div className="max-w-3xl">
           <p className="eyebrow">Avaliações</p>
           <h2 className="section-title">
-            Reconhecida por quem valoriza sabor, tradição e qualidade
+            <AccentText text="Reconhecida por quem valoriza sabor, tradição e qualidade" />
           </h2>
         </div>
         <div className="mt-10 grid gap-px overflow-hidden border border-black/10 bg-black/10 lg:grid-cols-3">
@@ -776,7 +798,7 @@ function ProductsPage() {
           <div className="max-w-3xl text-white">
             <p className="eyebrow text-[var(--yellow)]">Nossos produtos</p>
             <h1 className="mt-3 font-[family:var(--font-heading)] text-5xl leading-none md:text-7xl">
-              A linha completa da Doçura da Fazenda.
+              <AccentText text="A linha completa da Doçura da Fazenda." />
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/82">
               Pastosos, barras, tabletes, potes e displays para consumo,
@@ -800,7 +822,9 @@ function ProductsPage() {
       <section className="section-shell">
         <div className="max-w-3xl">
           <p className="eyebrow">Categorias</p>
-          <h2 className="section-title">Escolha pela ocasião de consumo ou venda</h2>
+          <h2 className="section-title">
+            <AccentText text="Escolha pela ocasião de consumo ou venda" />
+          </h2>
           <p className="section-copy">{siteData.productsIntro.body}</p>
         </div>
         <FeaturedProductCategories />
@@ -810,7 +834,9 @@ function ProductsPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="max-w-3xl">
             <p className="eyebrow">Catálogo completo</p>
-            <h2 className="section-title">Todos os produtos</h2>
+            <h2 className="section-title">
+              <AccentText text="Todos os produtos" />
+            </h2>
           </div>
           <a className="button-primary" href={siteData.whatsappUrl} target="_blank" rel="noreferrer">
             <MessageCircle className="h-4 w-4" />
@@ -837,11 +863,15 @@ function ProductSegments() {
               <div>
                 <p className="eyebrow">{category.name}</p>
                 <h3 className="font-[family:var(--font-heading)] text-4xl leading-none">
-                  {category.name === "Display"
-                    ? "Displays e potes para ponto de venda"
-                    : category.name === "Pastoso"
-                      ? "Doces pastosos por sabor e embalagem"
-                      : "Barras e tabletes de 400 g"}
+                  <AccentText
+                    text={
+                      category.name === "Display"
+                        ? "Displays e potes para ponto de venda"
+                        : category.name === "Pastoso"
+                          ? "Doces pastosos por sabor e embalagem"
+                          : "Barras e tabletes de 400 g"
+                    }
+                  />
                 </h3>
               </div>
               <p>{category.description}</p>
@@ -888,7 +918,9 @@ function ProductDetailPage({ productSlug }: { productSlug?: string }) {
 
           <div>
             <p className="eyebrow">{product.category} • {product.size}</p>
-            <h1 className="section-title">{product.name}</h1>
+            <h1 className="section-title">
+              <AccentText text={product.name} />
+            </h1>
             <p className="section-copy">{product.description}</p>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
@@ -917,7 +949,9 @@ function ProductDetailPage({ productSlug }: { productSlug?: string }) {
         <div className="section-shell">
           <div className="max-w-3xl">
             <p className="eyebrow">Veja também</p>
-            <h2 className="section-title">Mais produtos da categoria {product.category}</h2>
+            <h2 className="section-title">
+              <AccentText text={`Mais produtos da categoria ${product.category}`} />
+            </h2>
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {relatedProducts.map((item) => (
@@ -935,7 +969,7 @@ function ProductDetailPage({ productSlug }: { productSlug?: string }) {
                     {item.size}
                   </p>
                   <h3 className="mt-2 font-[family:var(--font-heading)] text-2xl">
-                    {item.name}
+                    <AccentText text={item.name} />
                   </h3>
                 </div>
               </Link>
@@ -961,10 +995,12 @@ function ContactSection() {
       <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
         <div className="bg-white p-7 shadow-[0_22px_60px_rgba(23,79,61,0.08)] md:p-9">
           <p className="eyebrow">Contato</p>
-          <h2 className="section-title">Visite, ligue ou fale conosco sobre revenda</h2>
+          <h2 className="section-title">
+            <AccentText text="Visite, ligue ou fale conosco sobre revenda" />
+          </h2>
           <div className="mt-8 space-y-5">
             <ContactRow icon={<Phone className="h-5 w-5" />} label="Telefone" value={siteData.phone} />
-          <ContactRow icon={<Mail className="h-5 w-5" />} label="Atendimento" value={siteData.email} />
+            <ContactRow icon={<Mail className="h-5 w-5" />} label="Atendimento" value={siteData.email} />
             <ContactRow icon={<MapPin className="h-5 w-5" />} label="Endereço" value={siteData.address} />
           </div>
           <a className="button-primary mt-8" href={siteData.whatsappUrl} target="_blank" rel="noreferrer">
@@ -1037,7 +1073,7 @@ function Footer() {
             <div>
               <p className="footer-title">Cambuí • Minas Gerais</p>
               <p className="mt-2 max-w-xl font-[family:var(--font-heading)] text-3xl leading-tight footer-heading">
-                Sabor mineiro desde 1998.
+                <AccentText text="Sabor mineiro desde 1998." />
               </p>
             </div>
           </div>

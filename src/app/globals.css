@@ -65,6 +65,10 @@ a {
   text-transform: uppercase;
 }
 
+.accent-glyph {
+  font-family: var(--font-display), Georgia, serif;
+}
+
 .hero-section {
   position: relative;
   isolation: isolate;
