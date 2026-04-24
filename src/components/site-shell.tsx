@@ -27,18 +27,52 @@ type SiteShellProps = {
   productSlug?: string;
 };
 
-const accentPattern = /[À-ÖØ-öø-ÿ]/;
+const accentedCharacters: Record<string, { base: string; mark: string; variant?: string }> = {
+  Á: { base: "A", mark: "´", variant: "acute" },
+  À: { base: "A", mark: "`", variant: "grave" },
+  Â: { base: "A", mark: "^", variant: "circumflex" },
+  Ã: { base: "A", mark: "~", variant: "tilde" },
+  É: { base: "E", mark: "´", variant: "acute" },
+  Ê: { base: "E", mark: "^", variant: "circumflex" },
+  Í: { base: "I", mark: "´", variant: "acute" },
+  Ó: { base: "O", mark: "´", variant: "acute" },
+  Ô: { base: "O", mark: "^", variant: "circumflex" },
+  Õ: { base: "O", mark: "~", variant: "tilde" },
+  Ú: { base: "U", mark: "´", variant: "acute" },
+  Ç: { base: "C", mark: "¸", variant: "cedilla" },
+  á: { base: "a", mark: "´", variant: "acute" },
+  à: { base: "a", mark: "`", variant: "grave" },
+  â: { base: "a", mark: "^", variant: "circumflex" },
+  ã: { base: "a", mark: "~", variant: "tilde" },
+  é: { base: "e", mark: "´", variant: "acute" },
+  ê: { base: "e", mark: "^", variant: "circumflex" },
+  í: { base: "i", mark: "´", variant: "acute" },
+  ó: { base: "o", mark: "´", variant: "acute" },
+  ô: { base: "o", mark: "^", variant: "circumflex" },
+  õ: { base: "o", mark: "~", variant: "tilde" },
+  ú: { base: "u", mark: "´", variant: "acute" },
+  ç: { base: "c", mark: "¸", variant: "cedilla" },
+};
 
 function AccentText({ text }: { text: string }) {
-  return Array.from(text).map((character, index) =>
-    accentPattern.test(character) ? (
-      <span className="accent-glyph" key={`${character}-${index}`}>
-        {character}
+  return Array.from(text).map((character, index) => {
+    const accent = accentedCharacters[character];
+
+    return accent ? (
+      <span
+        aria-label={character}
+        className={`accent-composed accent-${accent.variant}`}
+        key={`${character}-${index}`}
+      >
+        <span aria-hidden="true">{accent.base}</span>
+        <span aria-hidden="true" className="accent-mark">
+          {accent.mark}
+        </span>
       </span>
     ) : (
       character
-    ),
-  );
+    );
+  });
 }
 
 export function SiteShell({ page, productSlug }: SiteShellProps) {

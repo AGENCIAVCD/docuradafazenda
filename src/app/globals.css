@@ -65,8 +65,37 @@ a {
   text-transform: uppercase;
 }
 
-.accent-glyph {
+.accent-composed {
+  position: relative;
+  display: inline-block;
+}
+
+.accent-mark {
+  position: absolute;
+  left: 50%;
+  color: currentColor;
   font-family: var(--font-display), Georgia, serif;
+  font-size: 0.58em;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.accent-acute .accent-mark,
+.accent-grave .accent-mark,
+.accent-circumflex .accent-mark {
+  top: -0.43em;
+}
+
+.accent-tilde .accent-mark {
+  top: -0.38em;
+  font-size: 0.72em;
+}
+
+.accent-cedilla .accent-mark {
+  bottom: -0.31em;
+  font-size: 0.46em;
 }
 
 .hero-section {
