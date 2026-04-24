@@ -1,13 +1,5 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "Spearhead";
-  src: url("/assets/fonts/SPEARHEAD.otf") format("opentype");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 400;
-}
-
 :root {
   --background: #fff8e9;
   --foreground: #24170f;
@@ -19,7 +11,7 @@
   --red: #b6422d;
   --wood: #321b12;
   --ink: #24170f;
-  --font-heading: "Spearhead", var(--font-display), Georgia, serif;
+  --font-heading: var(--font-display), Georgia, serif;
 }
 
 ::selection {
@@ -63,39 +55,6 @@ a {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-}
-
-.accent-composed {
-  position: relative;
-  display: inline-block;
-}
-
-.accent-mark {
-  position: absolute;
-  left: 50%;
-  color: currentColor;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 0.58em;
-  font-weight: 900;
-  line-height: 1;
-  pointer-events: none;
-  transform: translateX(-50%);
-}
-
-.accent-acute .accent-mark,
-.accent-grave .accent-mark,
-.accent-circumflex .accent-mark {
-  top: -0.43em;
-}
-
-.accent-tilde .accent-mark {
-  top: -0.38em;
-  font-size: 0.72em;
-}
-
-.accent-cedilla .accent-mark {
-  bottom: -0.31em;
-  font-size: 0.46em;
 }
 
 .hero-section {

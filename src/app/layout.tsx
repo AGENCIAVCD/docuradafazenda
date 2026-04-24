@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Onest, Roboto_Slab } from "next/font/google";
+import { Londrina_Solid, Onest } from "next/font/google";
 import "./globals.css";
 
 const onest = Onest({
@@ -7,8 +7,9 @@ const onest = Onest({
   subsets: ["latin"],
 });
 
-const robotoSlab = Roboto_Slab({
+const londrinaSolid = Londrina_Solid({
   variable: "--font-display",
+  weight: ["300", "400", "900"],
   subsets: ["latin"],
 });
 
@@ -26,7 +27,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${onest.variable} ${robotoSlab.variable} h-full antialiased`}
+      className={`${onest.variable} ${londrinaSolid.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
