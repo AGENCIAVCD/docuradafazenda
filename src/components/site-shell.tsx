@@ -3,17 +3,24 @@
 import { animate, stagger } from "animejs";
 import {
   ArrowLeft,
+  ArrowUp,
+  BookOpenCheck,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Expand,
+  HeartHandshake,
   Mail,
   MapPin,
   Menu,
   MessageCircle,
   Phone,
+  Play,
   ShoppingBag,
+  Sparkles,
   Star,
   Store,
+  Wheat,
   X,
 } from "lucide-react";
 import Image from "next/image";
@@ -27,11 +34,161 @@ type SiteShellProps = {
   productSlug?: string;
 };
 
+type GoogleReview = {
+  author: string;
+  date: string;
+  rating: number;
+  text: string;
+  url: string | null;
+};
+
+type GoogleReviewsResponse = {
+  configured: boolean;
+  rating: number | null;
+  userRatingCount: number | null;
+  reviews: GoogleReview[];
+};
+
+type Product = (typeof siteData.products)[number];
+type ProductCategory = (typeof siteData.productCategories)[number];
+
+const pillarIcons = [BookOpenCheck, Wheat, Sparkles, HeartHandshake];
+
+const pagePaths: Record<SiteShellProps["page"], string> = {
+  home: "/",
+  products: "/produtos",
+  product: "/produtos",
+  about: "/sobre-nos",
+  contact: "/contato",
+};
+
+function getCatalogCategory(product: Product) {
+  if (product.category === "Pastoso") return "Pastosos";
+  if (product.category === "Barra") return "Barras";
+  if (product.category === "Tablete") return "Tabletes";
+
+  return "Kits e Displays";
+}
+
+function getProductDisplaySize(product: Product) {
+  if (product.category === "Pastoso" && product.size === "Pote familiar") {
+    return "680g";
+  }
+
+  return product.size;
+}
+
+function getProductFormat(product: Product) {
+  const size = getProductDisplaySize(product);
+
+  if (product.category === "Pastoso") return `Pastoso ${size}`;
+  if (product.category === "Barra") return `Barra ${size}`;
+  if (product.category === "Tablete") return `Tablete ${size}`;
+  if (product.size.includes("un.")) return `Pote ${size}`;
+
+  return `Display ${size}`;
+}
+
+function getProductBaseName(product: Product) {
+  return product.name
+    .replace(/\s+c\/\d+\s+un\.?\s*\d+g/gi, "")
+    .replace(/\s+em\s+Tabletes\s+\d+g/gi, "")
+    .replace(/\s+Barra\s+\d+g/gi, "")
+    .replace(/\s+\d+(?:,\d+)?kg/gi, "")
+    .replace(/\s+\d+g/gi, "")
+    .replace(/^Potes?\s+/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getTechnicalProductName(product: Product) {
+  return `${getProductBaseName(product)} - ${getProductFormat(product)}`;
+}
+
+function getBoxUnits(product: Product) {
+  if (product.category === "Pastoso") {
+    return getProductDisplaySize(product) === "300g"
+      ? "24 unidades por caixa"
+      : "15 unidades por caixa";
+  }
+
+  const packaging = product.nutrition?.packaging;
+  const match = packaging?.match(/(?:\d+\s+(?:unidades|displays)\s+por caixa)/i);
+
+  if (match) return match[0].replace(/^\w/, (letter) => letter.toUpperCase());
+  if (product.category === "Tablete" && product.size === "65g") return "Consulte caixa fechada";
+
+  return "Consulte com vendas";
+}
+
+function getProductLineBadge(product: Product) {
+  if (product.category === "Pastoso") return "Linha Pastosa";
+  if (product.category === "Barra") return "Linha Barras";
+  if (product.category === "Tablete") return "Linha Tabletes";
+
+  return "Kits e Displays";
+}
+
+function getWholesaleWhatsAppHref(product: Product) {
+  return `${siteData.whatsappUrl}?text=${encodeURIComponent(
+    `Olá, tenho interesse em revender o produto ${getTechnicalProductName(product)} - ${getCatalogCategory(product)}. Pode me enviar a tabela?`,
+  )}`;
+}
+
+const fallbackGoogleReviews: GoogleReview[] = [
+  {
+    author: "Andreia Toda",
+    date: "Editado 11 meses atrás",
+    rating: 5,
+    text:
+      "Melhor opção para comprar doces na região de Cambuí/MG. Fácil acesso, na rodovia Fernão Dias, sentido SP. Loja de fábrica, funcionários atenciosos e simpáticos. O espaço conta com café e salgados.",
+    url: null,
+  },
+  {
+    author: "Igor J Costa",
+    date: "11 meses atrás",
+    rating: 5,
+    text:
+      "Simplesmente o lugar onde você encontra o melhor doce de leite de Minas Gerais, entre outros produtos deliciosos! O espaço é simples, mas extremamente agradável, com aquele clima acolhedor que só o interior oferece. Vale muito a visita para quem aprecia produtos autênticos e de qualidade.",
+    url: null,
+  },
+  {
+    author: "Leandra",
+    date: "6 meses atrás",
+    rating: 5,
+    text:
+      "Comprei um queijo minas que até hoje não achei outro igual! Me arrependi de ter comprado só um. Uma sugestão para o estabelecimento seria ter prova dos produtos; se eu tivesse provado o queijo, teria comprado 10 kkkkk.",
+    url: null,
+  },
+  {
+    author: "Alison Santos",
+    date: "5 meses atrás",
+    rating: 5,
+    text:
+      "Ótimos doces, gostei de todos que comprei, as meninas me atenderam super bem e os preços são sensacionais.",
+    url: null,
+  },
+  {
+    author: "Guilherme Barros",
+    date: "2 meses atrás",
+    rating: 5,
+    text:
+      "Loja de fábrica e também funciona como lanchonete, vale a pena a parada. Local muito organizado e muito limpo. Tem uma grande variedade de itens, bolachas, doces, bebidas e até artesanato. Os banheiros são muito limpos. Se houver oportunidade, passarei uma outra vez por lá.",
+    url: null,
+  },
+];
+
 export function SiteShell({ page, productSlug }: SiteShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    animate(".enter > *", {
+    const enterElements = document.querySelectorAll(".enter > *");
+
+    if (enterElements.length === 0) {
+      return;
+    }
+
+    animate(enterElements, {
       translateY: [28, 0],
       opacity: [0, 1],
       delay: stagger(90),
@@ -56,6 +213,7 @@ export function SiteShell({ page, productSlug }: SiteShellProps) {
       {page === "contact" ? <ContactPage /> : null}
 
       <FloatingWhatsApp />
+      <BackToTopButton />
       <Footer />
     </div>
   );
@@ -71,35 +229,35 @@ function Header({
   setMobileMenuOpen: (value: boolean | ((current: boolean) => boolean)) => void;
 }) {
   return (
-    <header className="sticky top-0 z-50 border-b border-black/10 bg-[rgba(255,248,233,0.92)] backdrop-blur-xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 md:px-6">
-        <Link className="flex items-center gap-3" href="/">
+    <header className="site-header sticky top-0 z-50 border-b border-white/10 bg-[rgba(36,23,15,0.94)] backdrop-blur-xl">
+      <div className="site-header-inner mx-auto flex h-24 max-w-7xl items-center justify-between px-4 md:px-6">
+        <Link className="flex items-center gap-4" href="/">
           <Image
             src="/assets/images/logo.png"
             alt="Doçura da Fazenda"
-            width={66}
-            height={62}
+            width={92}
+            height={86}
             priority
-            className="h-14 w-auto"
+            className="site-logo h-[4.6rem] w-auto"
           />
           <div className="hidden min-[430px]:block">
-            <p className="font-[family:var(--font-heading)] text-xl leading-none">
+            <p className="brand-wordmark text-3xl leading-none">
               Doçura da Fazenda
             </p>
-            <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-[var(--green)]">
+            <p className="brand-location mt-1.5 text-sm font-bold uppercase">
               Cambuí • MG
             </p>
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-7 lg:flex">
+        <nav className="hidden items-center gap-8 lg:flex">
           {siteData.nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={`nav-link ${
-                item.href === (page === "home" ? "/" : `/${page}`)
-                  ? "text-[var(--red)]"
+                item.href === pagePaths[page]
+                  ? "nav-link-active"
                   : ""
               }`}
             >
@@ -110,7 +268,7 @@ function Header({
 
         <div className="flex items-center gap-3">
           <a
-            className="button-primary hidden sm:inline-flex"
+            className="button-primary header-whatsapp"
             href={siteData.whatsappUrl}
             target="_blank"
             rel="noreferrer"
@@ -120,7 +278,7 @@ function Header({
           </a>
           <button
             aria-label={mobileMenuOpen ? "Fechar navegação" : "Abrir navegação"}
-            className="grid h-11 w-11 place-items-center rounded-full border border-black/10 bg-white text-[var(--wood)] shadow-sm lg:hidden"
+            className="grid h-11 w-11 place-items-center rounded-full border border-white/15 bg-white/95 text-[var(--wood)] shadow-sm lg:hidden"
             onClick={() => setMobileMenuOpen((current) => !current)}
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -129,19 +287,41 @@ function Header({
       </div>
 
       {mobileMenuOpen ? (
-        <div className="border-t border-black/10 bg-[var(--cream)] px-4 py-5 lg:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col gap-4">
+        <div className="border-t border-black/10 bg-[radial-gradient(circle_at_86%_10%,rgba(243,197,21,0.18),transparent_28%),linear-gradient(180deg,rgba(255,248,233,0.98),rgba(255,244,220,0.98))] p-4 shadow-[0_24px_60px_rgba(36,23,15,0.14)] lg:hidden">
+          <nav className="mx-auto grid max-w-2xl gap-2.5">
             {siteData.nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-bold uppercase tracking-[0.12em]"
+                className={`flex min-h-16 items-center justify-between rounded-[14px] border bg-white/70 px-4 py-3 text-base font-black uppercase tracking-[0.12em] text-[var(--wood)] shadow-[0_14px_32px_rgba(36,23,15,0.06),inset_0_1px_0_rgba(255,255,255,0.72)] transition duration-200 hover:-translate-y-0.5 hover:border-[rgba(182,66,45,0.18)] hover:bg-white hover:text-[var(--red)] ${
+                  item.href === pagePaths[page]
+                    ? "border-[rgba(182,66,45,0.18)] bg-white text-[var(--red)]"
+                    : "border-black/10"
+                }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {item.label}
+                <span>{item.label}</span>
+                <ChevronRight className="h-5 w-5 text-[var(--red)]" />
               </Link>
             ))}
           </nav>
+          <div className="mx-auto mt-3 max-w-2xl rounded-2xl border border-[rgba(23,79,61,0.16)] bg-[linear-gradient(135deg,rgba(23,79,61,0.96),rgba(50,27,18,0.92))] p-4 text-[var(--cream)] shadow-[0_18px_42px_rgba(36,23,15,0.12)]">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-[var(--yellow)]">
+              Cambuí • MG
+            </p>
+            <strong className="mt-2 block max-w-72 font-[family-name:var(--font-heading)] text-2xl font-normal leading-none">
+              Doce de leite mineiro direto da fazenda.
+            </strong>
+            <a
+              className="button-primary mt-4 w-full"
+              href={siteData.whatsappUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </a>
+          </div>
         </div>
       ) : null}
     </header>
@@ -169,6 +349,11 @@ function HeroCarousel() {
   const shouldBlockClick = useRef(false);
   const hasDragged = useRef(false);
   const activeBanner = siteData.heroBanners[activeIndex];
+  const CtaIcon =
+    activeBanner.href === "/contato" ||
+    activeBanner.cta.toLocaleLowerCase("pt-BR").includes("localiza")
+      ? MapPin
+      : ShoppingBag;
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -268,30 +453,23 @@ function HeroCarousel() {
     >
       <div key={activeBanner.title} className="absolute inset-0">
         {activeBanner.mediaType === "video" ? (
-          <>
-            <Image
-              src={activeBanner.fallback ?? activeBanner.media}
-              alt=""
-              fill
-              priority
-              className="absolute inset-0 object-cover"
-            />
-            <video
-              className="absolute inset-0 h-full w-full object-cover"
-              autoPlay
-              loop
-              muted
-              playsInline
-              src={activeBanner.media}
-            />
-          </>
+          <video
+            className="hero-media absolute inset-0 h-full w-full object-cover"
+            autoPlay
+            loop
+            muted
+            preload="auto"
+            playsInline
+            src={activeBanner.media}
+          />
         ) : (
           <Image
             src={activeBanner.media}
             alt=""
             fill
             priority={activeIndex === 0}
-            className="absolute inset-0 object-cover"
+            sizes="100vw"
+            className="hero-media absolute inset-0 object-cover"
           />
         )}
       </div>
@@ -299,11 +477,17 @@ function HeroCarousel() {
       <div className="relative z-10 mx-auto flex min-h-[720px] max-w-7xl items-center px-4 pb-28 pt-14 md:px-6">
         <div key={activeBanner.title} className="hero-slide-copy glass-panel max-w-2xl">
           <p className="eyebrow">{activeBanner.eyebrow}</p>
-          <h1 className="hero-title">{activeBanner.title}</h1>
-          <p className="hero-copy">{activeBanner.body}</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <h1 className="hero-title">
+            <span className="hero-title-desktop">{activeBanner.title}</span>
+            <span className="hero-title-mobile">{activeBanner.mobileTitle}</span>
+          </h1>
+          <p className="hero-copy">
+            <span className="hero-copy-desktop">{activeBanner.body}</span>
+            <span className="hero-copy-mobile">{activeBanner.mobileBody}</span>
+          </p>
+          <div className="hero-actions mt-8 flex flex-col gap-3 sm:flex-row">
             <Link className="button-primary" href={activeBanner.href}>
-              <ShoppingBag className="h-4 w-4" />
+              <CtaIcon className="h-4 w-4" />
               {activeBanner.cta}
             </Link>
             <a
@@ -364,14 +548,14 @@ function TrustBar() {
   ];
 
   return (
-    <section className="border-y border-black/10 bg-white">
-      <div className="mx-auto grid max-w-7xl divide-y divide-black/10 px-4 md:grid-cols-3 md:divide-x md:divide-y-0 md:px-6">
+    <section className="trust-bar border-y border-black/10">
+      <div className="mx-auto grid max-w-7xl grid-cols-3 divide-x divide-[rgba(50,27,18,0.12)] px-2 md:px-6">
         {items.map(([value, label]) => (
-          <div key={value} className="py-6 md:px-8">
-            <p className="font-[family:var(--font-heading)] text-4xl leading-none text-[var(--green)]">
+          <div key={value} className="trust-bar-item px-2 py-4 text-center md:px-8 md:py-6 md:text-left">
+            <p className="brand-heading-font text-2xl leading-none text-[var(--green)] md:text-4xl">
               {value}
             </p>
-            <p className="mt-1 text-sm font-bold uppercase tracking-[0.12em] text-black/55">
+            <p className="mt-1 text-[0.58rem] font-bold uppercase tracking-[0.1em] text-black/55 md:text-sm md:tracking-[0.12em]">
               {label}
             </p>
           </div>
@@ -382,45 +566,156 @@ function TrustBar() {
 }
 
 function AboutSection() {
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [activeMilestone, setActiveMilestone] = useState(0);
+  const factoryVideo = "/assets/videos/Banner-animado3.mp4";
+
+  useEffect(() => {
+    if (!videoOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setVideoOpen(false);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [videoOpen]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveMilestone((current) => (current + 1) % siteData.about.milestones.length);
+    }, 4200);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
-    <section className="section-shell">
-      <div className="grid gap-12 lg:grid-cols-[1fr_1.05fr] lg:items-center">
-        <div className="photo-frame relative min-h-[460px] overflow-hidden">
-          <Image
-            src="/assets/images/emporio-1-1280x860-1.jpeg"
-            alt="Interior do empório Doçura da Fazenda"
-            fill
-            className="object-cover"
-          />
+    <section className="section-shell about-section">
+      <div className="about-layout">
+        <div className="about-video-column">
+          <div className="factory-video-card photo-frame relative min-h-[460px] overflow-hidden">
+            <video
+              src={factoryVideo}
+              autoPlay
+              muted
+              loop
+              preload="auto"
+              playsInline
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <button
+              type="button"
+              className="factory-video-play"
+              onClick={() => setVideoOpen(true)}
+              aria-label="Assistir vídeo da fabricação em tela cheia"
+            >
+              <Play className="h-6 w-6 fill-current" />
+              <span>Ver vídeo</span>
+            </button>
+          </div>
         </div>
-        <div>
-          <p className="eyebrow">{siteData.about.eyebrow}</p>
-          <h2 className="section-title">{siteData.about.title}</h2>
-          <p className="section-copy">{siteData.about.body}</p>
-          <div className="mt-8 grid gap-4">
-            {siteData.about.bullets.map((bullet) => (
-              <p key={bullet} className="flex gap-3 text-base leading-7">
-                <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[var(--green)]" />
-                <span>{bullet}</span>
-              </p>
+        <div className="about-content-column">
+          <div className="about-copy-card">
+            <p className="eyebrow">{siteData.about.eyebrow}</p>
+            <h2 className="section-title">{siteData.about.title}</h2>
+            <p className="section-copy">{siteData.about.body}</p>
+            <div className="mt-8 grid gap-4">
+              {siteData.about.bullets.map((bullet) => (
+                <p key={bullet} className="flex gap-3 text-base leading-7">
+                  <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-[var(--green)]" />
+                  <span>{bullet}</span>
+                </p>
+              ))}
+            </div>
+          </div>
+
+          <div className="story-carousel mt-10 grid gap-4 md:grid-cols-3">
+            {siteData.about.milestones.map((milestone, index) => (
+              <article
+                key={milestone.label}
+                className={`story-card ${
+                  index === activeMilestone ? "story-card-active" : ""
+                }`}
+              >
+                <p className="story-card-label">{milestone.label}</p>
+                <h3 className="story-card-value">{milestone.value}</h3>
+                <p className="story-card-copy">{milestone.detail}</p>
+              </article>
             ))}
+          </div>
+          <div className="story-dots" aria-label="Marcos da história">
+            {siteData.about.milestones.map((milestone, index) => (
+              <button
+                key={milestone.label}
+                aria-label={`Ver marco ${milestone.label}`}
+                className={`story-dot ${index === activeMilestone ? "story-dot-active" : ""}`}
+                onClick={() => setActiveMilestone(index)}
+                type="button"
+              />
+            ))}
+          </div>
+
+          <div className="pillar-grid mt-14 grid gap-4 md:grid-cols-4">
+            {siteData.about.pillars.map((pillar, index) => {
+              const PillarIcon = pillarIcons[index] ?? CheckCircle2;
+
+              return (
+                <article key={pillar.title} className="pillar-card">
+                  <div className="pillar-icon">
+                    <PillarIcon aria-hidden="true" className="h-6 w-6" strokeWidth={1.9} />
+                  </div>
+                  <h3 className="mt-4 brand-heading-font text-xl">
+                    {pillar.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6">{pillar.body}</p>
+                </article>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      <div className="pillar-grid mt-14 grid gap-4 md:grid-cols-4">
-        {siteData.about.pillars.map((pillar) => (
-          <article key={pillar.title} className="pillar-card">
-            <div className="pillar-icon relative h-16 w-16">
-              <Image src={pillar.image} alt={pillar.title} fill className="object-contain p-1" />
-            </div>
-            <h3 className="mt-5 font-[family:var(--font-heading)] text-2xl">
-              {pillar.title}
-            </h3>
-            <p className="mt-3 text-sm leading-7">{pillar.body}</p>
-          </article>
-        ))}
-      </div>
+      {videoOpen ? (
+        <div
+          className="factory-video-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vídeo da fabricação da Doçura da Fazenda"
+        >
+          <button
+            type="button"
+            className="factory-video-backdrop"
+            onClick={() => setVideoOpen(false)}
+            aria-label="Fechar vídeo"
+          />
+          <button
+            type="button"
+            className="factory-video-close"
+            onClick={() => setVideoOpen(false)}
+            aria-label="Fechar vídeo"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <div className="factory-video-modal-frame">
+            <video
+              src={factoryVideo}
+              controls
+              autoPlay
+              playsInline
+              className="h-full w-full object-contain"
+            />
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -435,21 +730,39 @@ function ProductsSection() {
             <h2 className="section-title">{siteData.productsIntro.title}</h2>
             <p className="section-copy">{siteData.productsIntro.body}</p>
           </div>
-          <Link className="button-primary" href="/products">
+          <Link className="button-primary" href="/produtos">
             <ShoppingBag className="h-4 w-4" />
             Ver linha completa
           </Link>
         </div>
         <FeaturedProductCategories />
         <ProductShowcase3D />
-        <ProductGrid limit={6} />
+        <div className="mt-10 flex justify-center">
+          <Link className="button-primary" href="/produtos">
+            <ShoppingBag className="h-4 w-4" />
+            Ver todos os produtos
+          </Link>
+        </div>
       </div>
     </section>
   );
 }
 
 function ProductShowcase3D() {
-  const showcaseProducts = siteData.products.slice(8, 16);
+  const showcaseSlugs = [
+    "doce-de-leite-tradicional-em-tabletes-200g",
+    "casadinho-de-doce-de-leite-com-chocolate-em-tabletes-200g",
+    "doce-de-leite-sortidos-em-tabletes-1-100kg",
+    "doce-de-leite-em-tablete-65g",
+    "doce-de-leite-com-coco-300g",
+    "doce-de-leite-tradicional-300g",
+    "doce-de-leite-com-ameixa-barra-400g",
+    "doce-de-leite-com-amendoim-barra-400g",
+    "display-de-doce-de-leite-tradicional-1-kg",
+  ];
+  const showcaseProducts = showcaseSlugs
+    .map((slug) => siteData.products.find((product) => product.slug === slug))
+    .filter((product): product is (typeof siteData.products)[number] => Boolean(product));
   const [activeIndex, setActiveIndex] = useState(0);
   const dragStartX = useRef<number | null>(null);
   const shouldBlockClick = useRef(false);
@@ -504,15 +817,15 @@ function ProductShowcase3D() {
 
   return (
     <div className="product-3d-shell">
-      <div className="product-3d-copy">
-        <p className="eyebrow">Destaques da vitrine</p>
-        <h3 className="font-[family:var(--font-heading)] text-4xl leading-none md:text-5xl">
-          Um carrossel para sentir a linha girando na prateleira.
-        </h3>
-        <p className="mt-4 text-base leading-8 text-white/78">
-          Navegue pelos sabores em destaque e abra a página do produto para falar
-          direto no WhatsApp.
-        </p>
+        <div className="product-3d-copy">
+          <p className="eyebrow eyebrow-dark showcase-eyebrow">Destaques da vitrine</p>
+          <h3 className="showcase-title">
+            Escolha o formato ideal e leve o sabor mineiro para sua mesa ou ponto de venda.
+          </h3>
+          <p className="showcase-copy">
+            Veja tabletes, pastosos, barras e displays com apresentação pronta
+            para consumo, presente ou revenda.
+          </p>
       </div>
 
       <div
@@ -562,7 +875,7 @@ function ProductShowcase3D() {
           return (
             <Link
               key={product.slug}
-              href={`/products/${product.slug}`}
+              href={`/produtos/${product.slug}`}
               className="product-3d-card"
               style={
                 {
@@ -578,6 +891,7 @@ function ProductShowcase3D() {
                 src={product.image}
                 alt={product.name}
                 fill
+                sizes="(max-width: 768px) 72vw, 304px"
                 className="object-contain p-6"
               />
               <span>{product.name}</span>
@@ -624,24 +938,25 @@ function ProductShowcase3D() {
 
 function FeaturedProductCategories() {
   return (
-    <div className="mt-10 grid gap-5 md:grid-cols-3">
+    <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {siteData.productCategories.map((category) => (
         <Link
           key={category.slug}
-          href={`/products#${category.slug}`}
+          href={`/produtos#${category.slug}`}
           className="category-card group"
         >
-          <div className="product-image-stage relative h-72">
+          <div className="product-image-stage category-image-stage relative h-56 lg:h-52">
             <Image
               src={category.image}
               alt={category.name}
               fill
-              className="object-contain p-8 transition duration-500 group-hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              className="object-contain p-6 transition duration-500 group-hover:scale-105"
             />
           </div>
-          <div className="border-t border-black/10 p-5">
+          <div className="border-t border-black/10 p-4">
             <p className="eyebrow">{category.name}</p>
-            <p className="mt-3 text-sm leading-7 text-black/68">
+            <p className="mt-3 text-sm leading-6 text-black/68">
               {category.description}
             </p>
           </div>
@@ -656,48 +971,138 @@ function ProductGrid({
   products: providedProducts,
 }: {
   limit?: number;
-  products?: typeof siteData.products;
+  products?: Product[];
 }) {
   const products = providedProducts ?? (limit ? siteData.products.slice(0, limit) : siteData.products);
 
   return (
-    <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      {products.map((product) => (
-        <Link key={product.slug} href={`/products/${product.slug}`} className="product-card group">
-          <div className="product-image-stage relative h-72">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              className="object-contain p-6 transition duration-500 group-hover:scale-105"
-            />
-          </div>
-          <div className="border-t border-black/10 p-5">
-            <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--green)]">
-              {product.category} • {product.size}
-            </p>
-            <h3 className="mt-2 font-[family:var(--font-heading)] text-2xl">
-              {product.name}
-            </h3>
-            <p className="mt-3 text-sm leading-7 text-black/68">
-              {product.description}
-            </p>
-            <span className="mt-5 inline-flex text-xs font-extrabold uppercase tracking-[0.12em] text-[var(--red)]">
-              Ver detalhes
-            </span>
-          </div>
-        </Link>
-      ))}
+    <div className="product-grid mt-10">
+      {products.map((product) => {
+        const technicalName = getTechnicalProductName(product);
+
+        return (
+          <article key={product.slug} className="product-card group">
+            <Link
+              href={`/produtos/${product.slug}`}
+              className="product-image-stage relative block aspect-square"
+              aria-label={`Ver ficha técnica de ${technicalName}`}
+            >
+              <Image
+                src={product.image}
+                alt={technicalName}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover transition duration-500 group-hover:scale-105"
+              />
+              <span className="product-line-badge">{getProductLineBadge(product)}</span>
+            </Link>
+            <div className="product-card-body">
+              <p className="product-card-kicker">
+                {getCatalogCategory(product)} • {getProductDisplaySize(product)}
+              </p>
+              <h3 className="product-card-title brand-heading-font">
+                {technicalName}
+              </h3>
+              <p className="product-box-label">
+                <span>Unidades por caixa</span>
+                <strong>{getBoxUnits(product)}</strong>
+              </p>
+              <p className="product-card-description">
+                {product.description}
+              </p>
+              <a
+                className="button-primary product-card-cta"
+                href={getWholesaleWhatsAppHref(product)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Consultar Atacado
+              </a>
+            </div>
+          </article>
+        );
+      })}
     </div>
+  );
+}
+
+function CatalogFilterNav({ categories }: { categories: ProductCategory[] }) {
+  return (
+    <nav className="catalog-filter-nav" aria-label="Categorias do catálogo técnico">
+      {categories.map((category) => (
+        <a key={category.slug} href={`#${category.slug}`}>
+          {category.name}
+        </a>
+      ))}
+    </nav>
+  );
+}
+
+function getProductsForCategory(category: ProductCategory) {
+  if (category.slug === "pastoso") {
+    return siteData.products.filter((product) => product.category === "Pastoso");
+  }
+
+  if (category.slug === "barra") {
+    return siteData.products.filter((product) => product.category === "Barra");
+  }
+
+  if (category.slug === "tablete") {
+    return siteData.products.filter((product) => product.category === "Tablete");
+  }
+
+  return siteData.products.filter((product) => product.category === "Display");
+}
+
+function ProductSegmentTitle({ category }: { category: ProductCategory }) {
+  const titleBySlug: Record<string, string> = {
+    pastoso: "Pastosos 680g e 300g",
+    barra: "Barras 400g",
+    tablete: "Tabletes 65g, 200g e displays",
+    "kits-displays": "Kits e displays para lojistas",
+  };
+
+  return (
+    <h3 className="brand-heading-font text-4xl leading-none">
+      {titleBySlug[category.slug]}
+    </h3>
+  );
+}
+
+function ProductSegments() {
+  return (
+    <>
+      <CatalogFilterNav categories={siteData.productCategories} />
+      <div className="mt-10 grid gap-12">
+        {siteData.productCategories.map((category) => {
+          const products = getProductsForCategory(category);
+
+          return (
+            <section key={category.slug} id={category.slug} className="product-segment">
+              <div className="product-segment-header">
+                <div>
+                  <p className="eyebrow">{category.name}</p>
+                  <ProductSegmentTitle category={category} />
+                </div>
+                <p>{category.description}</p>
+              </div>
+
+              <ProductGrid products={products} />
+            </section>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
 function ResellerSection() {
   return (
     <section className="section-shell">
-      <div className="grid overflow-hidden rounded-[15px] bg-[var(--green)] text-white shadow-[0_24px_65px_rgba(23,79,61,0.18)] lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="p-7 md:p-10">
-          <p className="eyebrow text-[var(--yellow)]">Parcerias</p>
+      <div className="emporio-section-card grid overflow-hidden rounded-[15px] text-white shadow-[0_24px_65px_rgba(23,79,61,0.18)] lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="emporio-section-copy p-7 md:p-10">
+          <p className="eyebrow eyebrow-contrast">Empório em Cambuí</p>
           <h2 className="section-title text-white">{siteData.reseller.title}</h2>
           <p className="mt-5 max-w-2xl text-base leading-8 text-white/82">
             {siteData.reseller.body}
@@ -709,45 +1114,325 @@ function ResellerSection() {
             rel="noreferrer"
           >
             <Store className="h-4 w-4" />
-            Quero revender
+            Conhecer o empório
           </a>
         </div>
-        <div className="grid min-h-[360px] grid-cols-2 gap-2 p-2">
-          {siteData.gallery.map((image) => (
-            <div key={image} className="photo-frame relative overflow-hidden">
-              <Image src={image} alt="Galeria do empório" fill className="object-cover" />
-            </div>
-          ))}
-        </div>
+        <GalleryGrid />
       </div>
     </section>
   );
 }
 
+function GalleryGrid() {
+  const [activeImage, setActiveImage] = useState<(typeof siteData.gallery)[number] | null>(null);
+  const [featuredImage, secondaryImage, tertiaryImage, ...galleryStrip] = siteData.gallery;
+
+  useEffect(() => {
+    if (!activeImage) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setActiveImage(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeImage]);
+
+  return (
+    <>
+      <div className="gallery-stage">
+        <div className="gallery-stage-main">
+          <button
+            type="button"
+            className="gallery-card gallery-card-featured photo-frame relative overflow-hidden"
+            onClick={() => setActiveImage(featuredImage)}
+            aria-label={`Ampliar imagem: ${featuredImage.alt}`}
+          >
+            <Image
+              src={featuredImage.src}
+              alt={featuredImage.alt}
+              fill
+              sizes="(max-width: 1024px) 100vw, 34vw"
+              className="object-cover"
+            />
+            <span className="gallery-card-overlay">
+              <span className="gallery-card-chip">
+                <Expand className="h-4 w-4" />
+                Ver espaço
+              </span>
+            </span>
+          </button>
+
+          <div className="gallery-stage-side">
+            {[secondaryImage, tertiaryImage].map((image) => (
+              <button
+                key={image.src}
+                type="button"
+                className="gallery-card gallery-card-support photo-frame relative overflow-hidden"
+                onClick={() => setActiveImage(image)}
+                aria-label={`Ampliar imagem: ${image.alt}`}
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 18vw"
+                  className="object-cover"
+                />
+                <span className="gallery-card-overlay">
+                  <span className="gallery-card-chip">
+                    <Expand className="h-4 w-4" />
+                    Ampliar
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="gallery-strip-shell">
+          <div className="gallery-strip-head">
+            <p>Mais do empório</p>
+            <span>{siteData.gallery.length} fotos</span>
+          </div>
+          <div className="gallery-strip" role="list" aria-label="Mais fotos do empório">
+            {galleryStrip.map((image) => (
+              <button
+                key={image.src}
+                type="button"
+                className="gallery-card gallery-card-thumb photo-frame relative overflow-hidden"
+                onClick={() => setActiveImage(image)}
+                aria-label={`Ampliar imagem: ${image.alt}`}
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  sizes="(max-width: 1024px) 44vw, 12vw"
+                  className="object-cover"
+                />
+                <span className="gallery-card-overlay">
+                  <span className="gallery-card-chip">
+                    <Expand className="h-4 w-4" />
+                    Ver
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <GalleryLightbox image={activeImage} onClose={() => setActiveImage(null)} />
+    </>
+  );
+}
+
+function GalleryLightbox({
+  image,
+  onClose,
+}: {
+  image: (typeof siteData.gallery)[number] | null;
+  onClose: () => void;
+}) {
+  if (!image) {
+    return null;
+  }
+
+  return (
+    <div
+      className="gallery-lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Visualização ampliada da galeria"
+    >
+      <button
+        type="button"
+        className="gallery-lightbox-backdrop"
+        onClick={onClose}
+        aria-label="Fechar visualização ampliada"
+      />
+      <button
+        type="button"
+        className="gallery-lightbox-close"
+        onClick={onClose}
+        aria-label="Fechar imagem ampliada"
+      >
+        <X className="h-5 w-5" />
+      </button>
+      <div className="gallery-lightbox-frame">
+        <div className="gallery-lightbox-image">
+          <Image
+            src={image.src}
+            alt={image.alt}
+            fill
+            sizes="100vw"
+            className="object-contain"
+            priority
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ReviewsSection() {
+  const [googleReviews, setGoogleReviews] = useState<GoogleReviewsResponse | null>(null);
+  const [activeReviewIndex, setActiveReviewIndex] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/google-reviews")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: GoogleReviewsResponse | null) => {
+        if (active) {
+          setGoogleReviews(data);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setGoogleReviews(null);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const officialReviews = googleReviews?.reviews ?? [];
+  const reviews = officialReviews.length > 0 ? officialReviews : fallbackGoogleReviews;
+  const usingFallbackReviews = officialReviews.length === 0;
+  const visibleReviewCount = Math.min(3, reviews.length);
+  const effectiveReviewIndex = reviews.length > 0 ? activeReviewIndex % reviews.length : 0;
+  const visibleReviews = Array.from({ length: visibleReviewCount }, (_, offset) => {
+    return reviews[(effectiveReviewIndex + offset) % reviews.length];
+  });
+
+  useEffect(() => {
+    if (reviews.length <= visibleReviewCount) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setActiveReviewIndex((current) => (current + 1) % reviews.length);
+    }, 5200);
+
+    return () => window.clearInterval(timer);
+  }, [reviews.length, visibleReviewCount]);
+
+  const goToPreviousReview = () => {
+    setActiveReviewIndex((current) =>
+      current === 0 ? reviews.length - 1 : current - 1,
+    );
+  };
+
+  const goToNextReview = () => {
+    setActiveReviewIndex((current) => (current + 1) % reviews.length);
+  };
+
   return (
     <section className="bg-white">
       <div className="section-shell">
-        <div className="max-w-3xl">
+        <div className="reviews-heading">
           <p className="eyebrow">Avaliações</p>
-          <h2 className="section-title">
+          <h2 className="section-title reviews-title">
             Reconhecida por quem valoriza sabor, tradição e qualidade
           </h2>
         </div>
-        <div className="mt-10 grid gap-px overflow-hidden border border-black/10 bg-black/10 lg:grid-cols-3">
-          {siteData.reviews.map((review) => (
-            <article key={review.author} className="bg-white p-6">
-              <div className="flex gap-1 text-[var(--yellow-deep)]">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star key={index} className="h-4 w-4 fill-current" />
+        {googleReviews?.rating && googleReviews.userRatingCount && !usingFallbackReviews ? (
+          <p className="mt-4 text-sm font-bold uppercase tracking-[0.12em] text-black/55">
+            Google {googleReviews.rating.toFixed(1)} • {googleReviews.userRatingCount} avaliações
+          </p>
+        ) : (
+          <p className="mt-4 text-sm font-bold uppercase tracking-[0.12em] text-black/55">
+            Comentários de clientes no Google
+          </p>
+        )}
+        <div className="review-carousel-shell mt-10">
+          <div className="review-grid">
+            {visibleReviews.map((review, index) => (
+              <article key={`${review.author}-${review.date}-${index}`} className="review-card">
+                <div className="review-card-head">
+                  <div className="review-avatar" aria-hidden="true">
+                    {review.author.charAt(0)}
+                  </div>
+                  <div>
+                    <h3>{review.author}</h3>
+                    <p>Local Guide</p>
+                  </div>
+                </div>
+                <div className="review-stars">
+                  {Array.from({ length: Math.max(1, Math.min(5, review.rating)) }).map(
+                    (_, index) => (
+                      <Star key={index} className="h-4 w-4 fill-current" />
+                    ),
+                  )}
+                  <span>{review.date}</span>
+                </div>
+                <p className="review-text">{review.text}</p>
+              </article>
+            ))}
+          </div>
+          {reviews.length > visibleReviewCount ? (
+            <div className="review-carousel-controls">
+              <button
+                aria-label="Avaliações anteriores"
+                className="hero-control"
+                onClick={goToPreviousReview}
+                type="button"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <div className="review-carousel-dots">
+                {reviews.map((review, index) => (
+                  <button
+                    key={`${review.author}-${review.date}-dot`}
+                    aria-label={`Ir para avaliação ${index + 1}`}
+                    className={`hero-dot ${
+                      index === effectiveReviewIndex ? "hero-dot-active" : ""
+                    }`}
+                    onClick={() => setActiveReviewIndex(index)}
+                    type="button"
+                  />
                 ))}
               </div>
-              <p className="mt-4 text-base leading-8 text-black/78">{review.text}</p>
-              <p className="mt-6 font-semibold">{review.author}</p>
-              <p className="text-sm text-black/55">{review.date}</p>
-            </article>
-          ))}
+              <button
+                aria-label="Próximas avaliações"
+                className="hero-control"
+                onClick={goToNextReview}
+                type="button"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          ) : null}
         </div>
+        {usingFallbackReviews ? (
+          <div className="review-fallback-note">
+            <p>Confira mais experiências de clientes no perfil da Doçura da Fazenda.</p>
+            <a
+              href={siteData.googleReviewsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="button-primary"
+            >
+              Ver avaliações no Google
+            </a>
+          </div>
+        ) : null}
       </div>
     </section>
   );
@@ -766,21 +1451,22 @@ function ProductsPage() {
     <main>
       <section className="products-hero relative overflow-hidden">
         <Image
-          src="/assets/images/emporio-0-1280x860-1.jpeg"
+          src="/assets/images/emporio/emporio-atual-02.jpg"
           alt=""
           fill
           priority
+          sizes="100vw"
           className="absolute inset-0 object-cover"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(36,23,15,0.88),rgba(23,79,61,0.72),rgba(243,197,21,0.28))]" />
-        <div className="relative mx-auto grid min-h-[480px] max-w-7xl items-center gap-8 px-4 py-16 md:grid-cols-[1fr_0.72fr] md:px-6">
+        <div className="absolute inset-0 bg-[linear-gradient(100deg,rgba(45,25,13,0.9),rgba(98,54,22,0.66),rgba(245,183,66,0.24))]" />
+        <div className="relative mx-auto grid min-h-[420px] max-w-7xl items-center gap-7 px-4 py-14 md:grid-cols-[1fr_0.58fr] md:px-6">
           <div className="max-w-3xl text-white">
-            <p className="eyebrow text-[var(--yellow)]">Nossos produtos</p>
-            <h1 className="mt-3 font-[family:var(--font-heading)] text-5xl leading-none md:text-7xl">
+            <p className="eyebrow eyebrow-contrast">Nossos produtos</p>
+            <h1 className="products-hero-title mt-3 brand-heading-font text-5xl leading-none md:text-6xl">
               A linha completa da Doçura da Fazenda.
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/82">
-              Pastosos, barras, tabletes, potes e displays para consumo,
+            <p className="products-hero-copy mt-5 max-w-2xl text-lg leading-8 text-white/82">
+              Tabletes, pastosos, barras, potes e displays para consumo,
               presente ou revenda, todos com o sabor tradicional de Cambuí.
             </p>
           </div>
@@ -826,75 +1512,55 @@ function ProductsPage() {
   );
 }
 
-function ProductSegments() {
-  return (
-    <div className="mt-10 grid gap-12">
-      {siteData.productCategories.map((category) => {
-        const products = siteData.products.filter(
-          (product) => product.category === category.name,
-        );
-
-        return (
-          <section key={category.slug} id={category.slug} className="product-segment">
-            <div className="product-segment-header">
-              <div>
-                <p className="eyebrow">{category.name}</p>
-                <h3 className="font-[family:var(--font-heading)] text-4xl leading-none">
-                  {category.name === "Display"
-                    ? "Displays e potes para ponto de venda"
-                    : category.name === "Pastoso"
-                      ? "Doces pastosos por sabor e embalagem"
-                      : "Barras e tabletes de 400 g"}
-                </h3>
-              </div>
-              <p>{category.description}</p>
-            </div>
-
-            <ProductGrid products={products} />
-          </section>
-        );
-      })}
-    </div>
-  );
-}
-
 function ProductDetailPage({ productSlug }: { productSlug?: string }) {
   const product = siteData.products.find((item) => item.slug === productSlug) ?? siteData.products[0];
   const relatedProducts = siteData.products
     .filter((item) => item.category === product.category && item.slug !== product.slug)
     .slice(0, 4);
-  const whatsappHref = `${siteData.whatsappUrl}?text=${encodeURIComponent(
-    `Olá! Gostaria de saber mais sobre o produto ${product.name}.`,
-  )}`;
+  const technicalName = getTechnicalProductName(product);
+  const whatsappHref = getWholesaleWhatsAppHref(product);
 
   return (
     <main>
-      <section className="section-shell">
+      <section className="section-shell product-detail-shell">
         <Link
-          href="/products"
-          className="inline-flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--green)]"
+          href="/produtos"
+          className="product-detail-backlink"
         >
           <ArrowLeft className="h-4 w-4" />
           Voltar aos produtos
         </Link>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div className="product-detail-media">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              priority
-              className="object-contain p-8 md:p-12"
-            />
+        <div className="product-detail-hero">
+          <div className="product-detail-visual-column">
+            <div className="product-detail-media">
+              <div className="product-detail-media-glow" aria-hidden="true" />
+              <div className="product-detail-media-grid" aria-hidden="true" />
+              <div className="product-detail-media-badge">
+                <span>{getCatalogCategory(product)}</span>
+                <strong>{getProductDisplaySize(product)}</strong>
+              </div>
+              <div className="product-detail-media-inner">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 46vw"
+                  className="object-contain p-6 md:p-10"
+                />
+              </div>
+            </div>
           </div>
 
-          <div>
-            <p className="eyebrow">{product.category} • {product.size}</p>
-            <h1 className="section-title">{product.name}</h1>
-            <p className="section-copy">{product.description}</p>
+          <div className="product-detail-summary">
+            <div className="product-detail-summary-head">
+              <p className="eyebrow">{getCatalogCategory(product)} • {getProductDisplaySize(product)}</p>
+              <h1 className="product-detail-title">{technicalName}</h1>
+              <p className="product-detail-copy">{product.description}</p>
+            </div>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            <div className="product-detail-feature-strip">
               {["Receita mineira", "Produção artesanal", "Ideal para revenda"].map((item) => (
                 <div key={item} className="product-feature-pill">
                   {item}
@@ -902,51 +1568,159 @@ function ProductDetailPage({ productSlug }: { productSlug?: string }) {
               ))}
             </div>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <ProductSpecificationGrid product={product} />
+
+            <div className="product-detail-actions">
               <a className="button-primary" href={whatsappHref} target="_blank" rel="noreferrer">
                 <MessageCircle className="h-4 w-4" />
-                Pedir pelo WhatsApp
+                Consultar Atacado
               </a>
-              <Link className="button-outline" href="/contact">
+              <Link className="button-outline" href="/contato">
                 <MapPin className="h-4 w-4" />
                 Ver localização
               </Link>
             </div>
           </div>
         </div>
+
+        {product.nutrition ? <ProductNutritionCard nutrition={product.nutrition} /> : null}
       </section>
 
       <section className="bg-[var(--yellow-soft)]">
         <div className="section-shell">
           <div className="max-w-3xl">
             <p className="eyebrow">Veja também</p>
-            <h2 className="section-title">Mais produtos da categoria {product.category}</h2>
+            <h2 className="section-title">Mais produtos da categoria {getCatalogCategory(product)}</h2>
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {relatedProducts.map((item) => (
-              <Link key={item.slug} href={`/products/${item.slug}`} className="product-card group">
-                  <div className="product-image-stage relative h-60">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className="object-contain p-6 transition duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <div className="border-t border-black/10 p-5">
-                  <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[var(--green)]">
-                    {item.size}
-                  </p>
-                  <h3 className="mt-2 font-[family:var(--font-heading)] text-2xl">
-                    {item.name}
-                  </h3>
-                </div>
-              </Link>
-            ))}
+            {relatedProducts.map((item) => {
+              const relatedTechnicalName = getTechnicalProductName(item);
+
+              return (
+                <article key={item.slug} className="product-card group">
+                  <Link
+                    href={`/produtos/${item.slug}`}
+                    className="product-image-stage relative block aspect-square"
+                    aria-label={`Ver ficha técnica de ${relatedTechnicalName}`}
+                  >
+                    <Image
+                      src={item.image}
+                      alt={relatedTechnicalName}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                    />
+                    <span className="product-line-badge">{getProductLineBadge(item)}</span>
+                  </Link>
+                  <div className="product-card-body">
+                    <p className="product-card-kicker">{getCatalogCategory(item)} • {getProductDisplaySize(item)}</p>
+                    <h3 className="product-card-title brand-heading-font">{relatedTechnicalName}</h3>
+                    <p className="product-box-label">
+                      <span>Unidades por caixa</span>
+                      <strong>{getBoxUnits(item)}</strong>
+                    </p>
+                    <a
+                      className="button-primary product-card-cta"
+                      href={getWholesaleWhatsAppHref(item)}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Consultar Atacado
+                    </a>
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
     </main>
+  );
+}
+
+function ProductSpecificationGrid({
+  product,
+}: {
+  product: Product;
+}) {
+  const specs = [
+    {
+      label: "Categoria",
+      value: getCatalogCategory(product),
+    },
+    {
+      label: "Peso / formato",
+      value: getProductFormat(product),
+    },
+    {
+      label: "Unidades por caixa",
+      value: getBoxUnits(product),
+    },
+  ];
+
+  return (
+    <section className="product-spec-grid">
+      {specs.map((spec) => (
+        <article key={spec.label} className="product-spec-card">
+          <span>{spec.label}</span>
+          <strong>{spec.value}</strong>
+        </article>
+      ))}
+    </section>
+  );
+}
+
+function ProductNutritionCard({
+  nutrition,
+}: {
+  nutrition: NonNullable<(typeof siteData.products)[number]["nutrition"]>;
+}) {
+  return (
+    <section className="product-nutrition-card">
+      <div className="product-nutrition-header">
+        <div>
+          <p className="eyebrow">Informação nutricional</p>
+          <h2 className="brand-heading-font text-3xl leading-[0.95] text-[var(--ink)] md:text-4xl">
+            Tabela nutricional da linha
+          </h2>
+        </div>
+
+        <div className="product-nutrition-meta">
+          <div>
+            <span>Porção de referência</span>
+            <strong>{nutrition.serving}</strong>
+          </div>
+          <div>
+            <span>Apresentação original</span>
+            <strong>{nutrition.packaging}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div className="product-nutrition-table-wrap">
+        <table className="product-nutrition-table">
+          <thead>
+            <tr>
+              <th>Componente</th>
+              <th>Quantidade</th>
+              <th>%VD*</th>
+            </tr>
+          </thead>
+          <tbody>
+            {nutrition.facts.map((fact) => (
+              <tr key={fact.label}>
+                <th scope="row">{fact.label}</th>
+                <td>{fact.value}</td>
+                <td>{fact.dailyValue}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p className="product-nutrition-note">{nutrition.disclaimer}</p>
+    </section>
   );
 }
 
@@ -962,7 +1736,7 @@ function ContactSection() {
   return (
     <section className="section-shell">
       <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr]">
-        <div className="bg-white p-7 shadow-[0_22px_60px_rgba(23,79,61,0.08)] md:p-9">
+        <div className="rounded-3xl bg-white p-7 shadow-[0_22px_60px_rgba(23,79,61,0.08)] md:p-9">
           <p className="eyebrow">Contato</p>
           <h2 className="section-title">
             Visite, ligue ou fale conosco sobre revenda
@@ -978,7 +1752,7 @@ function ContactSection() {
           </a>
         </div>
 
-        <div className="photo-frame min-h-[420px] overflow-hidden border border-black/10 bg-white">
+        <div className="min-h-[420px] overflow-hidden rounded-3xl border border-black/10 bg-white shadow-[0_22px_60px_rgba(23,79,61,0.08)]">
           <iframe
             title="Mapa da Doçura da Fazenda"
             src={siteData.mapEmbed}
@@ -1040,14 +1814,39 @@ function FloatingWhatsApp() {
   );
 }
 
+function BackToTopButton() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const updateVisibility = () => setVisible(window.scrollY > 520);
+
+    updateVisibility();
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+
+    return () => window.removeEventListener("scroll", updateVisibility);
+  }, []);
+
+  return (
+    <button
+      aria-label="Voltar ao topo"
+      className={`floating-to-top ${visible ? "floating-to-top-visible" : ""}`}
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      type="button"
+    >
+      <ArrowUp className="h-6 w-6" />
+    </button>
+  );
+}
+
 function Footer() {
   return (
     <footer id="footer" className="relative overflow-hidden bg-[var(--wood)] text-[var(--cream)]">
       <Image
-        src="/assets/images/11-1280x860-1.jpeg"
+        src="/assets/images/emporio/emporio-atual-04.jpg"
         alt=""
         fill
         aria-hidden="true"
+        sizes="100vw"
         className="absolute inset-0 object-cover opacity-14"
       />
       <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(50,27,18,0.98),rgba(23,79,61,0.92)_58%,rgba(182,66,45,0.78))]" />
@@ -1055,7 +1854,7 @@ function Footer() {
 
       <div className="relative mx-auto max-w-7xl px-4 py-8 md:px-6 md:py-10">
         <div className="footer-compact grid gap-7 lg:grid-cols-[1.1fr_0.9fr_0.8fr] lg:items-center">
-          <div className="flex gap-4">
+          <div className="footer-brand-block flex gap-4">
             <Image
               src="/assets/images/logo.png"
               alt="Doçura da Fazenda"
@@ -1065,7 +1864,7 @@ function Footer() {
             />
             <div>
               <p className="footer-title">Cambuí • Minas Gerais</p>
-              <p className="mt-2 max-w-xl font-[family:var(--font-heading)] text-3xl leading-tight footer-heading">
+              <p className="mt-2 max-w-xl brand-heading-font text-3xl leading-tight footer-heading">
                 Sabor mineiro desde 1998.
               </p>
             </div>
@@ -1076,6 +1875,15 @@ function Footer() {
               <Phone className="mt-1 h-4 w-4 shrink-0 text-[var(--yellow)]" />
               {siteData.phone}
             </p>
+            <a
+              className="flex gap-3 transition-colors duration-200 hover:text-white"
+              href={siteData.instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Star className="mt-1 h-4 w-4 shrink-0 text-[var(--yellow)]" />
+              Instagram oficial
+            </a>
             <p className="flex gap-3">
               <MapPin className="mt-1 h-4 w-4 shrink-0 text-[var(--yellow)]" />
               Rod. Fernão Dias, 894 • Cambuí - MG
@@ -1104,7 +1912,15 @@ function Footer() {
             ))}
           </nav>
           <p className="text-xs uppercase tracking-[0.12em] text-white/52">
-            Doçura da Fazenda © 2026 • Você Digital Propaganda
+            Doçura da Fazenda © 2026 •{" "}
+            <a
+              href="https://vocedigitalpropaganda.com.br/"
+              target="_blank"
+              rel="noreferrer"
+              className="footer-credit-link"
+            >
+              Você Digital Propaganda
+            </a>
           </p>
         </div>
       </div>
