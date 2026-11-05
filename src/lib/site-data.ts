@@ -1,11 +1,14 @@
 const nutritionDisclaimer =
   "*% Valores Diários de referência com base em uma dieta de 2.000kcal ou 8.400kJ. Seus valores diários podem ser maiores ou menores dependendo de suas necessidades energéticas. ** Valores Diários não estabelecidos.";
 
+const servingNutritionDisclaimer = "*Percentual de valores diários fornecidos pela porção.";
+
 function createNutritionProfile(
-  sourceUrl: string,
+  sourceUrl: string | null,
   packaging: string,
   serving: string,
   facts: Array<[label: string, value: string, dailyValue: string]>,
+  disclaimer: string = nutritionDisclaimer,
 ) {
   return {
     sourceUrl,
@@ -16,7 +19,7 @@ function createNutritionProfile(
       value,
       dailyValue,
     })),
-    disclaimer: nutritionDisclaimer,
+    disclaimer,
   };
 }
 
@@ -350,6 +353,42 @@ const nutritionProfiles = {
       ["Fibra Alimentar", "0g", "0%"],
       ["Sódio", "80mg", "3%"],
     ],
+  ),
+  tableteCafe200g: createNutritionProfile(
+    null,
+    "Tabletes saquinho 200g. 40 unidades por caixa.",
+    "Porção de 25g (3 unidades)",
+    [
+      ["Valores Energéticos", "98kcal", "5%"],
+      ["Carboidratos", "18g", "6%"],
+      ["Açúcares Totais", "18g", "—"],
+      ["Açúcares Adicionados", "15g", "30%"],
+      ["Proteínas", "1,9g", "4%"],
+      ["Gorduras Totais", "2,0g", "3%"],
+      ["Gorduras Saturadas", "1,3g", "7%"],
+      ["Gorduras Trans", "0g", "0%"],
+      ["Fibra Alimentar", "0g", "0%"],
+      ["Sódio", "38mg", "2%"],
+    ],
+    servingNutritionDisclaimer,
+  ),
+  tableteChococo200g: createNutritionProfile(
+    null,
+    "Tabletes saquinho 200g. 40 unidades por caixa.",
+    "Porção de 25g (3 unidades)",
+    [
+      ["Valores Energéticos", "87kcal", "4%"],
+      ["Carboidratos", "17g", "6%"],
+      ["Açúcares Totais", "13g", "—"],
+      ["Açúcares Adicionados", "11g", "22%"],
+      ["Proteínas", "1,7g", "3%"],
+      ["Gorduras Totais", "1,6g", "2%"],
+      ["Gorduras Saturadas", "1,0g", "5%"],
+      ["Gorduras Trans", "0g", "0%"],
+      ["Fibra Alimentar", "0g", "0%"],
+      ["Sódio", "38mg", "2%"],
+    ],
+    servingNutritionDisclaimer,
   ),
   sortidos1100g: createNutritionProfile(
     "https://docuradafazenda.com.br/doce-de-leite-sortidos-em-tabletes-1-100kg/",
@@ -761,6 +800,24 @@ export const siteData = {
       description: "Casadinho em tabletes com doce de leite e chocolate, trazendo uma combinação mais indulgente para a linha.",
       image: "https://docuradafazenda.com.br/wp-content/uploads/2024/03/Chocolate-200g.png",
       nutrition: nutritionProfiles.tableteCasadinho200g,
+    },
+    {
+      name: "Doce de Leite com Café em Tabletes 200g",
+      slug: "doce-de-leite-com-cafe-em-tabletes-200g",
+      category: "Tablete",
+      size: "200g",
+      description: "Tabletes de doce de leite com café em embalagem prática, unindo a receita mineira ao sabor encorpado do café.",
+      image: "/assets/images/products/novo-tablete-cafe-200g.png",
+      nutrition: nutritionProfiles.tableteCafe200g,
+    },
+    {
+      name: "Chococo - Doce de Leite com Chocolate e Coco em Tabletes 200g",
+      slug: "chococo-doce-de-leite-com-chocolate-e-coco-em-tabletes-200g",
+      category: "Tablete",
+      size: "200g",
+      description: "Chococo em tabletes com doce de leite, chocolate e coco em duas camadas, trazendo uma combinação marcante para a linha.",
+      image: "/assets/images/products/novo-tablete-chococo-200g.png",
+      nutrition: nutritionProfiles.tableteChococo200g,
     },
     {
       name: "Doce de Leite em Tablete 65g",
