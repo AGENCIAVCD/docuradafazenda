@@ -44,6 +44,8 @@ const products = [
   { name: "Tradicional", image: "/Assets/Pote-Tradicional-c20-PS-2.png", line: "Linha clássica" },
   { name: "Chocolate", image: "/Assets/Chocolate-200g-PS-2.png", line: "Ticket alto" },
   { name: "Cocada", image: "/Assets/Cocada-200g-PS-3.png", line: "Compra por impulso" },
+  { name: "Café", image: "/Assets/tablete-cafe-200g.webp", line: "Lançamento" },
+  { name: "Chococo", image: "/Assets/tablete-chococo-200g.webp", line: "Lançamento" },
   { name: "Barra 400g", image: "/Assets/Barra-tradicional-400g.png", line: "Volume" },
   { name: "Ameixa", image: "/Assets/Ameixa-Pastoso.jpg", line: "Mix premium" },
   { name: "Coco", image: "/Assets/Coco-Pastoso.jpg", line: "Alta saída" },
@@ -267,7 +269,7 @@ export default function App() {
               </p>
             </motion.div>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {products.map((product, index) => (
                 <motion.article
                   key={product.name}
